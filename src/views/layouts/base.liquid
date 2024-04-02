@@ -7,11 +7,12 @@
     <script type="module" src="http://localhost:5173/@vite/client" defer></script>
     <script type="module" src="http://localhost:5173/src/index.js" defer></script>
   {% else %}
-  <link rel="stylesheet" href="/main.css">
-  <script type="module" src="/main.js" defer></script>
+  {% comment %} <link rel="stylesheet" href="/main.css"> {% endcomment %}
+  {% comment %} <script type="module" src="/main.js" defer></script> {% endcomment %}
   <script type="nomodule" src="/polyfills-legacy.js" defer></script>
   <script type="nomodule" src="/main-legacy.js" defer></script>
   {% endif %}
+  <link rel="stylesheet" href="/styles/styles.css">
   {% block styles %}{% endblock %}
   {% block scripts %}{% endblock %}
 </head>
@@ -19,4 +20,10 @@
 <body>
   {% block content %}{% endblock %}
 </body>
+<script src="/js/script.js"></script>
+<footer>
+  {% block footer %}
+    <p>@2024 Jop Molenaar</p>
+  {% endblock %}
+</footer>
 </html>
