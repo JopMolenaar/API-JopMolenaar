@@ -3,7 +3,12 @@
 {% block content %}
 
 <div class="movie__container">
-  {% if movie.original_title %}
+  <form id="textForm">
+    <input type="text" id="textInput" placeholder="Enter text">
+    <button type="submit">Send Text</button>
+  </form>
+  <ul id="eventList"></ul>
+  {% comment %} {% if movie.original_title %}
     {% assign mov = movie.original_title %}
   {% else %}
     {% assign mov = movie.name %}
@@ -18,7 +23,7 @@
 
   <div class="backdrop-image__container">
     <img src="https://image.tmdb.org/t/p/w1280/{{ movie.backdrop_path }}" alt="" class="backdrop-image">
-  </div>
+  </div> {% endcomment %}
 </div>
 
 {% comment %}<img src="https://image.tmdb.org/t/p/w500/{{ movie.poster_path }}" alt="Movieposter for {{ mov }}">{% endcomment %}
