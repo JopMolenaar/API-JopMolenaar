@@ -11,15 +11,12 @@ const engine = new Liquid({
 
 const app = new App();
 
-app
-  .use(logger())
-  .use('/', sirv('dist/assets'))
-  .listen(3000);
+app.use(logger()).use("/", sirv("dist/assets")).listen(3080);
 
 app.get('/', async (req, res) => {
-
-  const movieData = await getMovies();
-  return res.send(renderTemplate('views/index.liquid', { title: 'Movies', movieData }));
+  // const movieData = await getMovies();
+  return res.send(renderTemplate("views/index.liquid"));
+  // return res.send(renderTemplate('views/index.liquid', { title: 'Movies', movieData }));
   // return res.send(renderTemplate('views/index.liquid', { title: 'Home' }));
 });
 
