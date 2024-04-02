@@ -68,13 +68,17 @@ function eventsHandler(request, response, next) {
 }
 
 function sendEventsToAll(newFact) {
-    console.log(clients);
+    // console.log(clients);
     clients.forEach((client) => client.response.write(`data: ${client.id} ${JSON.stringify(newFact)}\n\n`));
 }
 
 async function addFact(request, response, next) {
     const newFact = request.body;
+    clients.forEach((client) => {
+        console.log(client.id);
+    });
     console.log(newFact);
+    // TODO add client id to fact in json
     facts.push(newFact);
     response.json(newFact);
     return sendEventsToAll(newFact);
