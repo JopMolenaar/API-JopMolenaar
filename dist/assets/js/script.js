@@ -1,6 +1,6 @@
 const userId = getIdFromUrl("account");
 const chatId = getIdFromUrl("chat");
-const eventList = document.getElementById("eventList");
+const eventList = document.querySelector(".message-box");
 
 fillInPrevMessages();
 
@@ -22,7 +22,6 @@ evtSource.onmessage = (event) => {
 
         // Check if the message already exists in local storage
         const messageExists = allMessages.some((msg) => msg.messageDate === message.messageDate);
-        // const messageExists = allMessages.some((msg) => msg.text === message.text && msg.userId === message.userId);
 
         // Store the new message in local storage only if it doesn't already exist
         if (!messageExists) {
@@ -35,7 +34,7 @@ evtSource.onmessage = (event) => {
     }
 };
 
-document.getElementById("textForm").addEventListener("submit", async (event) => {
+document.querySelector(".textForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = document.getElementById("textInput").value;
     const response = await fetch("/fact", {

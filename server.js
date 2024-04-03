@@ -60,7 +60,8 @@ app.get("/account/:id", async (req, res) => {
 app.get("/account/:clientid/chat/:chatId", async (req, res) => {
     const clientId = req.params.clientid;
     const chatId = req.params.chatId;
-    return res.send(renderTemplate("src/views/chat.liquid"));
+    const receiverId = getReceiverId(chatId, clientId); // Extract the receiver's user ID from the chat ID
+    return res.send(renderTemplate("src/views/chat.liquid", { id: receiverId }));
 });
 
 const renderTemplate = (template, data) => {

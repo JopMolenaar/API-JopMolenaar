@@ -8,14 +8,16 @@
     <button type="submit">Send Text</button>
   </form>
   <ul id="eventList"></ul> {% endcomment %}
-
-    <h1>Your account: {{ id }}</h1>
+    <div>
+      <a href="/links">Log out</a>
+    </div>
+    <h1>Your account: person {{ id }}</h1>
 
     <div>
         <h2>Contacts</h2>
         <ul class="contacts">
             {% for contact in contactData %}
-                <li><a href="/account/{{ id }}/chat/{{ id | times: contact }}">{{ contact }}</a></li>
+                <li><a href="/account/{{ id }}/chat/{{ id | times: contact }}">person {{ contact }}</a></li>
             {% endfor %} 
         </ul>
     </div>

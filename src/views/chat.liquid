@@ -1,31 +1,34 @@
 {% layout "src/views/layouts/base.liquid" %}
 
 {% block content %}
-
-<div class="movie__container">
-  <form id="textForm">
-    <input type="text" id="textInput" placeholder="Enter text">
-    <button type="submit">Send Text</button>
-  </form>
-  <ul id="eventList"></ul>
-  {% comment %} // TODO  hard code links to chats with eachoter and store the chats in local storage {% endcomment %}
-  {% comment %} {% if movie.original_title %}
-    {% assign mov = movie.original_title %}
-  {% else %}
-    {% assign mov = movie.name %}
-  {% endif %}
-  <div class="movie__info">
-    <img src="https://image.tmdb.org/t/p/w500/{{ movie.poster_path }}" alt="Movieposter for {{ mov }}" class="movie__info-image">
-    <h1 class="h1">{{ mov }}</h1>
-    <p class="movie__info-description">{{ movie.overview }}</p>
-    <p>Release date: {{ movie.release_date }}</p>
-    <p>Rating: {{ movie.vote_average }}</p>
+<main>
+  <div>
+    <a href="../">Back</a>
   </div>
-
-  <div class="backdrop-image__container">
-    <img src="https://image.tmdb.org/t/p/w1280/{{ movie.backdrop_path }}" alt="" class="backdrop-image">
-  </div> {% endcomment %}
-</div>
-
-{% comment %}<img src="https://image.tmdb.org/t/p/w500/{{ movie.poster_path }}" alt="Movieposter for {{ mov }}">{% endcomment %}
+  <h1>Send a message to person {{ id  }}</h1>
+  <div class="chat-box">
+    <form class="textForm">
+      <input type="text" id="textInput" placeholder="Enter text">
+      <button type="submit">Send Text</button>
+    </form>
+    <ul class="message-box"></ul>
+    {% comment %} // TODO  hard code links to chats with eachoter and store the chats in local storage {% endcomment %}
+    {% comment %} {% if movie.original_title %}
+      {% assign mov = movie.original_title %}
+    {% else %}
+      {% assign mov = movie.name %}
+    {% endif %}
+    <div class="movie__info">
+      <img src="https://image.tmdb.org/t/p/w500/{{ movie.poster_path }}" alt="Movieposter for {{ mov }}" class="movie__info-image">
+      <h1 class="h1">{{ mov }}</h1>
+      <p class="movie__info-description">{{ movie.overview }}</p>
+      <p>Release date: {{ movie.release_date }}</p>
+      <p>Rating: {{ movie.vote_average }}</p>
+    </div>
+  
+    <div class="backdrop-image__container">
+      <img src="https://image.tmdb.org/t/p/w1280/{{ movie.backdrop_path }}" alt="" class="backdrop-image">
+    </div> {% endcomment %}
+  </div>
+</main>
 {% endblock %}
