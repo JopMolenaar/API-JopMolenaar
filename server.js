@@ -103,10 +103,9 @@ function eventsHandler(request, response, userId) {
 }
 
 async function addFact(request, response, next) {
-    const { text, userId, chatId } = request.body;
+    const { text, userId, chatId, messageId } = request.body;
     const receiverId = getReceiverId(chatId, userId); // Extract the receiver's user ID from the chat ID
-    const messageDate = Date.now();
-    const newFact = { text, userId, receiverId, chatId, messageDate }; // Include receiverId in the newFact object
+    const newFact = { text, userId, receiverId, chatId, messageId }; // Include receiverId in the newFact object
     facts.push(newFact);
     response.json(newFact);
     console.log("json:", newFact);

@@ -21,7 +21,7 @@ evtSource.onmessage = (event) => {
         let allMessages = JSON.parse(localStorage.getItem(chatId)) || [];
 
         // Check if the message already exists in local storage
-        const messageExists = allMessages.some((msg) => msg.messageDate === message.messageDate);
+        const messageExists = allMessages.some((msg) => msg.messageId === message.messageId);
 
         // Store the new message in local storage only if it doesn't already exist
         if (!messageExists) {
@@ -36,6 +36,8 @@ evtSource.onmessage = (event) => {
 
 document.querySelector(".textForm").addEventListener("submit", async (event) => {
     event.preventDefault();
+    const messageId = Math.random();
+    console.log(messageId);
     const text = document.getElementById("textInput").value;
     const response = await fetch("/fact", {
         method: "POST",
@@ -43,7 +45,7 @@ document.querySelector(".textForm").addEventListener("submit", async (event) => 
             "Content-Type": "application/json",
         },
         // get the user from the url and send user id to the backend
-        body: JSON.stringify({ text: text, userId: userId, chatId: chatId }),
+        body: JSON.stringify({ text: text, userId: userId, chatId: chatId, messageId: messageId }),
     });
     if (response.ok) {
         console.log("Text sent successfully");
