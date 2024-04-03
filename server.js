@@ -11,7 +11,7 @@ const engine = new Liquid({
 
 const app = express();
 
-app.use(sirv("dist/assets"));
+app.use(sirv("dist/assets")); // change this to normal files with css and js
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -24,6 +24,7 @@ const PORT = process.env.PORT || 4000;
 let clients = [];
 let facts = [];
 
+// TODO haal uit database
 const contactOfClient = [
     {
         id: "1",
@@ -48,7 +49,6 @@ app.get("/links", async (req, res) => {
 });
 app.get("/account/:id", async (req, res) => {
     const clientId = req.params.id;
-    console.log(clientId);
     let contacts;
     contactOfClient.forEach((client) => {
         if (client.id === clientId) {
@@ -60,7 +60,6 @@ app.get("/account/:id", async (req, res) => {
 app.get("/account/:clientid/chat/:chatId", async (req, res) => {
     const clientId = req.params.clientid;
     const chatId = req.params.chatId;
-    console.log(clientId, chatId);
     return res.send(renderTemplate("src/views/chat.liquid"));
 });
 
@@ -73,13 +72,14 @@ const renderTemplate = (template, data) => {
     return engine.renderFileSync(template, templateData);
 };
 
-function eventsHandler(request, response, next) {
+function eventsHandler(request, response, userId) {
     const headers = {
         "Content-Type": "text/event-stream",
         Connection: "keep-alive",
         "Cache-Control": "no-cache",
     };
     response.writeHead(200, headers);
+    console.log(`User: ${userId} Connection opened`);
 
     const data = `data: ${JSON.stringify(facts)}\n\n`;
 
@@ -88,6 +88,7 @@ function eventsHandler(request, response, next) {
     const clientId = Date.now();
     console.log(`${clientId} Connection opened`);
     const newClient = {
+        userId: userId,
         id: clientId,
         response,
     };
@@ -100,25 +101,47 @@ function eventsHandler(request, response, next) {
     });
 }
 
-function sendEventsToAll(newFact) {
-    console.log("new fact", newFact);
-    // TODO only for a couple of clients
-    clients.forEach((client) => client.response.write(`data: ${JSON.stringify(newFact)}\n\n`));
-}
-
 async function addFact(request, response, next) {
-    console.log(request.body);
-    const newFact = {
-        ...request.body,
-        clientId: 999,
-    };
+    const { text, userId, chatId } = request.body;
+    const receiverId = getReceiverId(chatId, userId); // Extract the receiver's user ID from the chat ID
+    const messageDate = Date.now();
+    const newFact = { text, userId, receiverId, chatId, messageDate }; // Include receiverId in the newFact object
     facts.push(newFact);
     response.json(newFact);
     console.log("json:", newFact);
-    return sendEventsToAll(newFact);
+    return sendEventsToChat(newFact, chatId); // Send message to the specific chat
 }
 
-app.get("/events", eventsHandler);
+function getReceiverId(chatId, senderId) {
+    return chatId / senderId; // Calculate the receiver's user ID from the chat ID and sender's user ID
+}
+
+function sendEventsToChat(newFact, chatId) {
+    clients.forEach((client) => {
+        console.log(client.userId);
+    });
+    clients.forEach((client) => {
+        if (client.userId === newFact.userId) {
+            // console.log("from user: ", newFact.userId, " for user: ", newFact.receiverId);
+            // console.log("sendEventsToChat: ", "client id: ", client.id, "userId: ", client.userId, "chat id: ", chatId);
+
+            const sender = newFact.userId;
+            const receiver = newFact.receiverId;
+            clients.forEach((client) => {
+                console.log("user id", client.userId, "receiver: ", receiver);
+                if (client.userId == receiver || client.userId == sender) {
+                    console.log("send to: ", client.id);
+                    client.response.write(`data: ${JSON.stringify(newFact)}\n\n`); // This sends the message to the client I think
+                }
+            });
+        }
+    });
+}
+
+app.get("/events/:userId", (req, res) => {
+    const userId = req.params.userId;
+    eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
+});
 app.post("/fact", addFact);
 
 // import { json, urlencoded } from "body-parser";
