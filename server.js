@@ -17,11 +17,27 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/status", (request, response) => response.json({ clients: clients.length }));
+// TODO show all chats with clients
 
 const PORT = process.env.PORT || 4000;
 
 let clients = [];
 let facts = [];
+
+const contactOfClient = [
+    {
+        id: "1",
+        contacts: ["2", "3"],
+    },
+    {
+        id: "2",
+        contacts: ["1", "3"],
+    },
+    {
+        id: "3",
+        contacts: ["1", "2"],
+    },
+];
 
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
@@ -30,13 +46,22 @@ app.listen(PORT, () => {
 app.get("/links", async (req, res) => {
     return res.send(renderTemplate("src/views/index.liquid"));
 });
-app.get("/chat", async (req, res) => {
-    return res.send(renderTemplate("src/views/detail.liquid"));
-});
-app.get("/chat/:id", async (req, res) => {
+app.get("/account/:id", async (req, res) => {
     const clientId = req.params.id;
     console.log(clientId);
-    return res.send(renderTemplate("src/views/detail.liquid"));
+    let contacts;
+    contactOfClient.forEach((client) => {
+        if (client.id === clientId) {
+            contacts = client.contacts;
+        }
+    });
+    return res.send(renderTemplate("src/views/account.liquid", { contactData: contacts, id: clientId }));
+});
+app.get("/account/:clientid/chat/:chatId", async (req, res) => {
+    const clientId = req.params.clientid;
+    const chatId = req.params.chatId;
+    console.log(clientId, chatId);
+    return res.send(renderTemplate("src/views/chat.liquid"));
 });
 
 const renderTemplate = (template, data) => {
@@ -77,6 +102,7 @@ function eventsHandler(request, response, next) {
 
 function sendEventsToAll(newFact) {
     console.log("new fact", newFact);
+    // TODO only for a couple of clients
     clients.forEach((client) => client.response.write(`data: ${JSON.stringify(newFact)}\n\n`));
 }
 
@@ -86,8 +112,6 @@ async function addFact(request, response, next) {
         ...request.body,
         clientId: 999,
     };
-    // get the client id from the body.
-    // TODO add client id to fact in json
     facts.push(newFact);
     response.json(newFact);
     console.log("json:", newFact);
