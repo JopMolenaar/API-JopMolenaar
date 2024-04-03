@@ -80,6 +80,15 @@ function eventsHandler(request, response, userId) {
         "Cache-Control": "no-cache",
     };
     response.writeHead(200, headers);
+
+    clients.forEach((client) => {
+        if (client.userId === userId) {
+            const dupliId = client.userId;
+            console.log(`${dupliId} Connection closed`);
+            clients = clients.filter((client) => client.userId !== dupliId);
+        }
+    });
+
     console.log(`User: ${userId} Connection opened`);
 
     const data = `data: ${JSON.stringify(facts)}\n\n`;
@@ -108,7 +117,7 @@ async function addFact(request, response, next) {
     const newFact = { text, userId, receiverId, chatId, messageId }; // Include receiverId in the newFact object
     facts.push(newFact);
     response.json(newFact);
-    console.log("json:", newFact);
+    // console.log("json:", newFact);
     return sendEventsToChat(newFact, chatId); // Send message to the specific chat
 }
 
@@ -118,7 +127,7 @@ function getReceiverId(chatId, senderId) {
 
 function sendEventsToChat(newFact, chatId) {
     clients.forEach((client) => {
-        console.log(client.userId);
+        console.log("id's: ", client.userId);
     });
     clients.forEach((client) => {
         if (client.userId === newFact.userId) {
