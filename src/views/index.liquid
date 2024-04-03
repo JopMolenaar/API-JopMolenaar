@@ -1,20 +1,22 @@
 {% layout "src/views/layouts/base.liquid" %}
 
 {% block content %}
-<ul class="grid">
-  {% for movie in movieData.results %}
+{% comment %} <ul class="grid"> {% endcomment %}
+  {% comment %} {% for movie in movieData.results %}
     {% if movie.original_title %}
       {% assign mov = movie.original_title %}
     {% else %}
       {% assign mov = movie.name %}
-    {% endif %}
-    <li>
-      <a href="/movie/{{ movie.id }}">
-        {% render 'src/components/poster/poster.liquid', movie: movie %}
+    {% endif %} {% endcomment %}
+      <a href="/chat/{{ 1 }}">1</a>
+      <a href="/chat/{{ 2 }}">2</a>
+      <a href="/chat/{{ 3 }}">3</a>
+  {% comment %} {% endfor %} {% endcomment %}
+{% comment %} </ul> {% endcomment %}
+{% endblock %}
+
+
+  {% comment %} {% render 'src/components/poster/poster.liquid', movie: movie %} {% endcomment %}
         {% comment %}<pre>{{ movie | json }}</pre>{% endcomment %}
         {% comment %}<img src="https://image.tmdb.org/t/p/w500/{{ movie.backdrop_path }}" alt="">{% endcomment %}
-      </a>
-    </li>
-  {% endfor %}
-</ul>
-{% endblock %}
+   

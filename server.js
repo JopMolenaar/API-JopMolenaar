@@ -27,7 +27,15 @@ app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
 });
 
+app.get("/links", async (req, res) => {
+    return res.send(renderTemplate("src/views/index.liquid"));
+});
 app.get("/chat", async (req, res) => {
+    return res.send(renderTemplate("src/views/detail.liquid"));
+});
+app.get("/chat/:id", async (req, res) => {
+    const clientId = req.params.id;
+    console.log(clientId);
     return res.send(renderTemplate("src/views/detail.liquid"));
 });
 
@@ -68,19 +76,21 @@ function eventsHandler(request, response, next) {
 }
 
 function sendEventsToAll(newFact) {
-    // console.log(clients);
-    clients.forEach((client) => client.response.write(`data: ${client.id} ${JSON.stringify(newFact)}\n\n`));
+    console.log("new fact", newFact);
+    clients.forEach((client) => client.response.write(`data: ${JSON.stringify(newFact)}\n\n`));
 }
 
 async function addFact(request, response, next) {
-    const newFact = request.body;
-    clients.forEach((client) => {
-        console.log(client.id);
-    });
-    console.log(newFact);
+    console.log(request.body);
+    const newFact = {
+        ...request.body,
+        clientId: 999,
+    };
+    // get the client id from the body.
     // TODO add client id to fact in json
     facts.push(newFact);
     response.json(newFact);
+    console.log("json:", newFact);
     return sendEventsToAll(newFact);
 }
 
