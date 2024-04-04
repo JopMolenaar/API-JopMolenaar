@@ -2,8 +2,38 @@
 
 ## Description
 
+<!--   -->
+
+## Process
+
+[Link to process (Dutch) ]()
+<!-- update when the blog is online -->
+
+## Table of contents
+
+- Installation
+- Use of features
+- Whishlist
+- License
+
+## Installation
+
+1. Clone the repository:
+
+    ```
+    git clone 
+    ```
+
+2. Open the cloned file with your code editor and start coding!
+
+
+## Use of features
+
 ## Ideas/checklist
 
+## License
+
+My website is open-source and released under the [MIT License](LICENSE).
 
 <!-- # API @cmda-minor-web 2023 - 2024
 
