@@ -44,7 +44,7 @@ app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
 });
 
-app.get("/links", async (req, res) => {
+app.get("/login", async (req, res) => {
     return res.send(renderTemplate("src/views/index.liquid"));
 });
 app.get("/account/:id", async (req, res) => {

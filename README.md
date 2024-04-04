@@ -1,4 +1,11 @@
-# API @cmda-minor-web 2023 - 2024
+# API cmd minor
+
+## Description
+
+## Ideas/checklist
+
+
+<!-- # API @cmda-minor-web 2023 - 2024
 
 Het web is een geweldige plek en de beschikbare technologieën ervan zijn vandaag de dag krachtiger dan ooit tevoren.
 De kracht van het web ligt in het feit dat het een platform is dat voor iedereen beschikbaar is en dat het gebaseerd is
@@ -80,4 +87,4 @@ de 3 criteria hieronder moeten voldoen. Een hoger cijfer kan je halen door verde
 - Voor build tooling(CSS en JS) maak ik gebruik van [Vite](https://vitejs.dev/).
 
 Voel je vrij om je eigen technolgieën te kiezen, zolang je maar kan uitleggen waarom je deze hebt gekozen en zolang
-je geen gebruik maakt van een framework zoals React, Vue, Svelte, Angular, etc. 
+je geen gebruik maakt van een framework zoals React, Vue, Svelte, Angular, etc.  -->

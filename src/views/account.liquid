@@ -17,7 +17,7 @@
         <h2>Contacts</h2>
         <ul class="contacts">
             {% for contact in contactData %}
-                <li><a href="/account/{{ id }}/chat/{{ id | times: contact }}">person {{ contact }}</a></li>
+                <li>Chat with: <a href="/account/{{ id }}/chat/{{ id | times: contact }}">person {{ contact }}</a></li>
             {% endfor %} 
         </ul>
     </div>
