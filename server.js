@@ -1,3 +1,7 @@
+///////////////////////////////
+//////////// Setup ////////////
+///////////////////////////////
+
 require("dotenv").config();
 const express = require("express");
 const { Liquid } = require("liquidjs");
@@ -17,9 +21,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/status", (request, response) => response.json({ clients: clients.length }));
+app.get("/showUsers", (request, response) => response.json({ users: users }));
+
 // TODO show all chats with clients
 
 const PORT = process.env.PORT || 4000;
+
+app.listen(PORT, () => {
+    console.log(`Server listening at http://localhost:${PORT}`);
+});
+
+///////////////////////////////
+///////// Stored data /////////
+///////////////////////////////
+
+let users = [];
 
 let clients = [];
 let facts = [];
@@ -40,39 +56,17 @@ const contactOfClient = [
     },
 ];
 
-app.listen(PORT, () => {
-    console.log(`Server listening at http://localhost:${PORT}`);
-});
+///////////////////////////////
+////////// Functions //////////
+///////////////////////////////
 
-app.get("/login", async (req, res) => {
-    // person data later weghalen
-    return res.send(renderTemplate("src/views/index.liquid", { persons: contactOfClient }));
-});
-app.get("/account/:id", async (req, res) => {
-    const clientId = req.params.id;
-    let contacts;
-    contactOfClient.forEach((client) => {
-        if (client.id === clientId) {
-            contacts = client.contacts;
-        }
-    });
-    return res.send(renderTemplate("src/views/account.liquid", { contactData: contacts, id: clientId }));
-});
-app.get("/account/:clientid/chat/:chatId", async (req, res) => {
-    const clientId = req.params.clientid;
-    const chatId = req.params.chatId;
-    const receiverId = getReceiverId(chatId, clientId); // Extract the receiver's user ID from the chat ID
-    return res.send(renderTemplate("src/views/chat.liquid", { id: receiverId }));
-});
-
-const renderTemplate = (template, data) => {
+function renderTemplate(template, data) {
     const templateData = {
         NODE_ENV: process.env.NODE_ENV || "production",
         ...data,
     };
-
     return engine.renderFileSync(template, templateData);
-};
+}
 
 function eventsHandler(request, response, userId) {
     const headers = {
@@ -148,11 +142,130 @@ function sendEventsToChat(newFact, chatId) {
     });
 }
 
+function addUser(req, res) {
+    const { name } = req.body;
+    // Check if the user already exists
+    const existingUser = users.find((user) => user.name === name);
+    if (existingUser) {
+        return res.status(400).send("User already exists");
+    }
+
+    // Generate a random 8-digit ID
+    const id = Math.floor(10000000 + Math.random() * 90000000).toString();
+
+    const newUser = {
+        id: id,
+        name: name,
+        chats: [],
+        contacts: [],
+    };
+
+    users.push(newUser);
+    console.log("All users:", users);
+
+    // Redirect to the account page of the new added user
+    // res.redirect(`/account/${id}`);
+    return res.status(200).send(`/account/${id}`);
+}
+
+function addContact(req, res) {
+    const { contact, userId } = req.body;
+    console.log(contact, userId);
+    const userToAddContact = users.find((u) => u.id === userId);
+    const contactToAdd = users.find((u) => u.name === contact);
+
+    if (!userToAddContact || !contactToAdd) {
+        return res.status(404).send("User or contact not found");
+    }
+
+    // Update chats array for both user and contact
+    userToAddContact.contacts.push(contactToAdd.id);
+    contactToAdd.contacts.push(userToAddContact.id);
+
+    return res.status(201).send(`Contact added successfully: ${contactToAdd.name} & ${userToAddContact.name} are now contacts`);
+}
+
+function addChat(req, res) {
+    const { contact, user } = req.body;
+
+    const userToAddChat = users.find((u) => u.name === user);
+    const contactToAddChat = users.find((u) => u.name === contact);
+
+    if (!userToAddChat || !contactToAddChat) {
+        return res.status(404).send("User or contact not found");
+    }
+
+    // Generate a random 10-digit ID for the chat
+    const chatId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+
+    // Update chats array for both user and contact
+    userToAddChat.chats.push(chatId);
+    contactToAddChat.chats.push(chatId);
+
+    // Redirect to the chat page
+    res.redirect(`/account/${userToAddChat.id}/chat/${chatId}`);
+}
+
+function verifyUser(req, res) {
+    const { name } = req.body;
+    const existingUser = users.find((user) => user.name === name);
+    if (!existingUser) {
+        return res.status(400).send("User doesn't exists");
+    }
+
+    return res.status(200).send(`/account/${existingUser.id}`);
+}
+
+///////////////////////////////
+/////////// app.get ///////////
+///////////////////////////////
+
+app.get("/login", async (req, res) => {
+    // person data later weghalen
+    return res.send(renderTemplate("src/views/index.liquid", { persons: contactOfClient, page: "Log-in" }));
+});
+
+app.get("/signup", async (req, res) => {
+    // person data later weghalen
+    return res.send(renderTemplate("src/views/index.liquid", { page: "Sign-up" }));
+});
+
+app.get("/account/:id", async (req, res) => {
+    const clientId = req.params.id;
+    let currentUser;
+    users.forEach((user) => {
+        if (user.id === clientId) {
+            currentUser = user;
+        }
+    });
+    return res.send(renderTemplate("src/views/account.liquid", { user: currentUser }));
+});
+
+app.get("/account/:clientid/chat/:chatId", async (req, res) => {
+    const clientId = req.params.clientid;
+    const chatId = req.params.chatId;
+    const receiverId = getReceiverId(chatId, clientId); // Extract the receiver's user ID from the chat ID
+    return res.send(renderTemplate("src/views/chat.liquid", { id: receiverId }));
+});
+
 app.get("/events/:userId", (req, res) => {
     const userId = req.params.userId;
     eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
 });
+
+///////////////////////////////
+////////// app.post ///////////
+///////////////////////////////
+
 app.post("/fact", addFact);
+app.post("/makeAccount", addUser);
+app.post("/loginInAccount", verifyUser);
+app.post("/addContact", addContact);
+app.post("/addChat", addChat);
+
+///////////////////////////////
+///// extra shit comments /////
+///////////////////////////////
 
 // import { json, urlencoded } from "body-parser";
 // import { cors } from "@tinyhttp/cors";
