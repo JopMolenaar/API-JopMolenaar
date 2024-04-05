@@ -1,3 +1,6 @@
+// TODO als je js uitstaat, send dan een request naar iets die het hetzelfde doet op de backend, ]
+// maar de pagina refreshed en dus de berichten weer laad uit de database
+
 const userId = getIdFromUrl("account");
 const chatId = getIdFromUrl("chat");
 const eventList = document.querySelector(".message-box");

@@ -45,7 +45,8 @@ app.listen(PORT, () => {
 });
 
 app.get("/login", async (req, res) => {
-    return res.send(renderTemplate("src/views/index.liquid"));
+    // person data later weghalen
+    return res.send(renderTemplate("src/views/index.liquid", { persons: contactOfClient }));
 });
 app.get("/account/:id", async (req, res) => {
     const clientId = req.params.id;
