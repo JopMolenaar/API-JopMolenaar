@@ -39,5 +39,6 @@ async function postData(linkToFetch, obj) {
     } else {
         const text = await response.text(); // Get the redirect URL from the response
         console.error(text);
+        // TODO error message
     }
 }
