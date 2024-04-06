@@ -8,10 +8,10 @@ function getIdFromUrl(segment) {
 function fillInPrevMessages() {
     const allMessages = JSON.parse(localStorage.getItem(chatId));
     if (allMessages) {
-        console.log("prev", allMessages);
+        // console.log("prev", allMessages);
         allMessages.forEach((message) => {
             const newElement = document.createElement("li");
-            newElement.textContent = `Message from ${message.userId}: ${message.text}`;
+            newElement.textContent = `Message from ${message.from}: ${message.text}`;
             eventList.appendChild(newElement);
         });
     }

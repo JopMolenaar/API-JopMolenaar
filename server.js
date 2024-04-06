@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/status", (request, response) => {
     console.log(clients);
-    response.json({ clients: clients });
+    response.json({ clients: clients, facts: facts });
 });
 app.get("/showUsers", (request, response) => response.json({ users: users }));
 
@@ -40,7 +40,7 @@ app.listen(PORT, () => {
 
 let users = [];
 let clients = [];
-// TODO Load data with the messages that are in this data array 
+// TODO Load data with the messages that are in this data array
 let facts = [];
 
 ///////////////////////////////
@@ -147,8 +147,7 @@ function addUser(req, res) {
     console.log("All users:", users);
 
     // Redirect to the account page of the new added user
-    // res.redirect(`/account/${id}`);
-    return res.status(200).send(`/account/${id}`);
+    return res.redirect(`/account/${id}`);
 }
 
 function addContact(req, res) {
@@ -221,8 +220,7 @@ function verifyUser(req, res) {
     if (!existingUser) {
         return res.status(400).send("User doesn't exists");
     }
-
-    return res.status(200).send(`/account/${existingUser.id}`);
+    return res.redirect(`/account/${existingUser.id}`);
 }
 
 ///////////////////////////////
@@ -230,12 +228,10 @@ function verifyUser(req, res) {
 ///////////////////////////////
 
 app.get("/login", async (req, res) => {
-    // person data later weghalen
     return res.send(renderTemplate("src/views/index.liquid", { page: "Log-in" }));
 });
 
 app.get("/signup", async (req, res) => {
-    // person data later weghalen
     return res.send(renderTemplate("src/views/index.liquid", { page: "Sign-up" }));
 });
 
@@ -260,6 +256,7 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     const currentUser = users.find((u) => u.id === clientId);
     const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
     if (currentUser && currentContact) {
+        // TODO get all stored chats from that chat
         return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact }));
     } else {
         return res.send(renderTemplate("src/views/notFound.liquid"));
