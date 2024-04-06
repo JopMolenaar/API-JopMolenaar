@@ -26,7 +26,7 @@
       <h2>Chats</h2>
       <ul>
         {% for chat in user.chats %}
-          <li>Chat with: <a href="/account/{{ user.id }}/chat/{{ chat.id }}">person {{ chat.name }}</a></li>
+          <li>Chat with: <a href="/account/{{ user.id }}/chat/{{ chat.id }}"> {{ chat.name }}</a></li>
         {% endfor %} 
       </ul>
     </div>

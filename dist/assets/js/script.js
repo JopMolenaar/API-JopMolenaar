@@ -15,7 +15,7 @@ evtSource.onmessage = (event) => {
     if (message.text !== undefined) {
         const newElement = document.createElement("li");
         if (message.chatId === chatId) {
-            newElement.textContent = `Message from ${message.userId}: ${message.text}`;
+            newElement.textContent = `Message from ${message.from}: ${message.text}`;
             eventList.appendChild(newElement);
         } else {
             // TODO make push noti
@@ -40,7 +40,6 @@ evtSource.onmessage = (event) => {
 document.querySelector(".textForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     const messageId = Math.random();
-    console.log(messageId);
     const text = document.getElementById("textInput").value;
     const response = await fetch("/fact", {
         method: "POST",

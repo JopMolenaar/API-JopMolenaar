@@ -20,7 +20,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/status", (request, response) => response.json({ clients: clients.length }));
+app.get("/status", (request, response) => {
+    console.log(clients);
+    response.json({ clients: clients });
+});
 app.get("/showUsers", (request, response) => response.json({ users: users }));
 
 // TODO add password in data and make a session id?
@@ -91,16 +94,39 @@ function eventsHandler(request, response, userId) {
 
 async function addFact(request, response, next) {
     const { text, userId, chatId, messageId } = request.body;
-    const receiverId = getReceiverId(chatId, userId); // Extract the receiver's user ID from the chat ID
-    const newFact = { text, userId, receiverId, chatId, messageId }; // Include receiverId in the newFact object
+    const senderName = users.find((u) => u.id === userId);
+    const from = senderName.name;
+    const currentReceiver = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== userId));
+    const receiverId = currentReceiver.id;
+    const newFact = { text, userId, receiverId, from, chatId, messageId }; // Include receiverId in the newFact object
     facts.push(newFact);
     response.json(newFact);
     return sendEventsToChat(newFact, chatId); // Send message to the specific chat
 }
+// async function addFact(request, response, next) {
+//     const { text, userId, chatId, messageId } = request.body;
 
-function getReceiverId(chatId, senderId) {
-    return chatId / senderId; // Calculate the receiver's user ID from the chat ID and sender's user ID
-}
+//     // Find the current receiver based on chatId and exclude the sender (userId)
+//     const currentReceiver = users.find((u) => {
+//         // Exclude the sender (userId) and find the user with the specified chatId
+//         return u.id !== userId && u.chats.some((chat) => chat === chatId);
+//     });
+//     console.log(currentReceiver);
+//     if (!currentReceiver) {
+//         return response.status(404).json({ error: "Receiver not found" });
+//     }
+
+//     const receiverId = currentReceiver.id;
+//     const newFact = { text, userId, receiverId, chatId, messageId };
+
+//     facts.push(newFact);
+//     response.json(newFact);
+
+//     // Send message to the specific chat
+//     return sendEventsToChat(newFact, chatId);
+
+//     // You may want to handle errors in sendEventsToChat function as well
+// }
 
 function sendEventsToChat(newFact, chatId) {
     clients.forEach((client) => {
@@ -108,13 +134,11 @@ function sendEventsToChat(newFact, chatId) {
     });
     clients.forEach((client) => {
         if (client.userId === newFact.userId) {
-            // console.log("from user: ", newFact.userId, " for user: ", newFact.receiverId);
-            // console.log("sendEventsToChat: ", "client id: ", client.id, "userId: ", client.userId, "chat id: ", chatId);
-
+            console.log("New fact:", newFact);
             const sender = newFact.userId;
             const receiver = newFact.receiverId;
             clients.forEach((client) => {
-                console.log("user id", client.userId, "receiver: ", receiver);
+                console.log("user id", sender, "receiver:", receiver);
                 if (client.userId == receiver || client.userId == sender) {
                     console.log("send to: ", client.id);
                     client.response.write(`data: ${JSON.stringify(newFact)}\n\n`); // This sends the message to the client I think
@@ -259,9 +283,8 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     const clientId = req.params.id;
     const chatId = req.params.chatId;
     const currentUser = users.find((u) => u.id === clientId);
-    const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId));
-    const currentChat = currentUser.chats.find((chat) => chat.id === chatId);
-    if (currentUser && currentChat && currentContact) {
+    const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
+    if (currentUser && currentContact) {
         return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact }));
     } else {
         return res.send(renderTemplate("src/views/notFound.liquid"));
