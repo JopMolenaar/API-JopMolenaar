@@ -32,10 +32,14 @@ async function postData(linkToFetch, obj) {
         body: JSON.stringify(obj),
     });
     if (response.ok) {
-        // console.log("Text sent successfully");
-        console.log(response);
-        const redirectUrl = await response.text(); // Get the redirect URL from the response
-        window.location.href = redirectUrl; // Redirect the user to the account page
+        const responseInText = await response.text(); // Get the redirect URL from the response
+        console.log(responseInText);
+        if (responseInText.includes("Contact added successfully")) {
+            // Add link with contact
+            console.log("Add link with contact");
+        } else {
+            window.location.href = responseInText; // Redirect the user to the account page
+        }
     } else {
         const text = await response.text(); // Get the redirect URL from the response
         console.error(text);

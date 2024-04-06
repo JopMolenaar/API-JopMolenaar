@@ -21,14 +21,6 @@
 {% else if page == "Log-in"  %}
   <a href="/signup">I dont have a account yet.</a>
 {% endif %}
-
-
-
-
-    <p>The log in field is not working now so choose an account:</p>
-    {% for person in persons %}
-      <p>Chat with: <a href="/account/{{ person.id }}">Person {{ person.id }}</a></p>
-    {% endfor %} 
 </main>
 <script src="/js/extraFunctions.js"></script>
 <script src="/js/loginSignup.js"></script>

@@ -5,14 +5,32 @@
     <div>
       <a href="/login">Log out</a>
     </div>
-    <h1>Welcome: person {{ user.name }}</h1>
+    <h1>Welcome: {{ user.name }}</h1>
     <div>
         <h2>Contacts</h2>
         <ul class="contacts">
             {% for contact in user.contacts %}
-                <li>Chat with: <a href="/account/{{ user.id }}/chat/{{ user.id | times: contact }}">person {{ contact }}</a></li>
+                <li> {{ contact }}
+                  {% comment %} // TODO if statement if chat is true else geen button {% endcomment %}
+                <form action="/addChat" method="post">
+                <input type="text" name="user" value="{{ user.id }}">
+                <input type="text" name="contact" value="{{ contact }}">
+                <button type="submit">Make a chat with {{ contact }}</button>
+                </form>  
+                {% comment %} <a href="/account/{{ user.id }}/makeChatWith/{{ contact }}">
+                Make a chat with {{ contact }}
+                </a> {% endcomment %}
+                </li>
             {% endfor %} 
         </ul>
+    </div>
+    <div>
+      <h2>Chats</h2>
+      <ul>
+        {% for chat in user.chats %}
+          <li>Chat with: <a href="/account/{{ user.id }}/chat/{{ chat.id }}">person {{ chat.name }}</a></li>
+        {% endfor %} 
+      </ul>
     </div>
     <section>
       <h2>Add contact</h2>
