@@ -13,8 +13,8 @@
                 <li> {{ contact.name }}
                   {% if contact.existingChat == false %}
                     <form action="/addChat" method="post">
-                    <input type="text" name="user" value="{{ user.id }}">
-                    <input type="text" name="contact" value="{{ contact.id }}">
+                    <input type="hidden" name="user" value="{{ user.id }}">
+                    <input type="hidden" name="contact" value="{{ contact.id }}">
                     <button type="submit">New chat</button>
                     </form>  
                   {% endif %}
