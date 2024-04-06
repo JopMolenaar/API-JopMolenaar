@@ -36,25 +36,8 @@ app.listen(PORT, () => {
 ///////////////////////////////
 
 let users = [];
-
 let clients = [];
 let facts = [];
-
-// TODO haal uit database
-const contactOfClient = [
-    {
-        id: "1",
-        contacts: ["2", "3"],
-    },
-    {
-        id: "2",
-        contacts: ["1", "3"],
-    },
-    {
-        id: "3",
-        contacts: ["1", "2"],
-    },
-];
 
 ///////////////////////////////
 ////////// Functions //////////
@@ -180,9 +163,18 @@ function addContact(req, res) {
     const contactExistsInContact = contactToAdd.contacts.find((c) => c === userToAddContact.id);
     if (!contactExists && !contactExistsInContact) {
         // Update chats array for both user and contact
-        // TODO also push the name of that contact
-        userToAddContact.contacts.push(contactToAdd.id);
-        contactToAdd.contacts.push(userToAddContact.id);
+        const newContactForUser = {
+            id: contactToAdd.id,
+            name: contactToAdd.name,
+            existingChat: false,
+        };
+        const newContact = {
+            id: userToAddContact.id,
+            name: userToAddContact.name,
+            existingChat: false,
+        };
+        userToAddContact.contacts.push(newContactForUser);
+        contactToAdd.contacts.push(newContact);
     } else {
         return res.status(400).send("Contact already exists");
     }
@@ -192,10 +184,6 @@ function addContact(req, res) {
 
 function addChat(req, res) {
     const { contact, user } = req.body;
-    // /account/:id/makeChatWith/:contactId
-    // const user = req.params.id;
-    // const contactId = req.params.contactId;
-    console.log("user:", user, "contactId:", contact);
 
     const userToAddChat = users.find((u) => u.id === user);
     const contactToAddChat = users.find((u) => u.id === contact);
@@ -206,14 +194,22 @@ function addChat(req, res) {
 
     // Generate a random 10-digit ID for the chat
     const chatId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-    const newChat = {
+    const newChatUser = {
         id: chatId,
         name: contactToAddChat.name,
     };
+    const newChatContact = {
+        id: chatId,
+        name: userToAddChat.name,
+    };
     // TODO also find the user and contact and set chat on true
+    const setChatToTrueContact = contactToAddChat.contacts.find((c) => c.id === userToAddChat.id);
+    const setChatToTrueUser = userToAddChat.contacts.find((c) => c.id === contactToAddChat.id);
+    setChatToTrueContact.existingChat = true;
+    setChatToTrueUser.existingChat = true;
     // Update chats array for both user and contact
-    userToAddChat.chats.push(newChat);
-    contactToAddChat.chats.push(newChat);
+    userToAddChat.chats.push(newChatUser);
+    contactToAddChat.chats.push(newChatContact);
 
     // Redirect to the chat page
     // TODO This redirect doet het gewoon
@@ -263,10 +259,10 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     const clientId = req.params.id;
     const chatId = req.params.chatId;
     const currentUser = users.find((u) => u.id === clientId);
+    const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId));
     const currentChat = currentUser.chats.find((chat) => chat.id === chatId);
-    if (currentUser && currentChat) {
-        const receiverId = getReceiverId(chatId, clientId); // Extract the receiver's user ID from the chat ID
-        return res.send(renderTemplate("src/views/chat.liquid", { id: receiverId }));
+    if (currentUser && currentChat && currentContact) {
+        return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact }));
     } else {
         return res.send(renderTemplate("src/views/notFound.liquid"));
     }

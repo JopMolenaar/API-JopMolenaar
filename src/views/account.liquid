@@ -10,16 +10,14 @@
         <h2>Contacts</h2>
         <ul class="contacts">
             {% for contact in user.contacts %}
-                <li> {{ contact }}
-                  {% comment %} // TODO if statement if chat is true else geen button {% endcomment %}
-                <form action="/addChat" method="post">
-                <input type="text" name="user" value="{{ user.id }}">
-                <input type="text" name="contact" value="{{ contact }}">
-                <button type="submit">Make a chat with {{ contact }}</button>
-                </form>  
-                {% comment %} <a href="/account/{{ user.id }}/makeChatWith/{{ contact }}">
-                Make a chat with {{ contact }}
-                </a> {% endcomment %}
+                <li> {{ contact.name }}
+                  {% if contact.existingChat == false %}
+                    <form action="/addChat" method="post">
+                    <input type="text" name="user" value="{{ user.id }}">
+                    <input type="text" name="contact" value="{{ contact.id }}">
+                    <button type="submit">New chat</button>
+                    </form>  
+                  {% endif %}
                 </li>
             {% endfor %} 
         </ul>
