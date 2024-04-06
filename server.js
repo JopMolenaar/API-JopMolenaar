@@ -40,6 +40,7 @@ app.listen(PORT, () => {
 
 let users = [];
 let clients = [];
+// TODO Load data with the messages that are in this data array 
 let facts = [];
 
 ///////////////////////////////
@@ -103,30 +104,6 @@ async function addFact(request, response, next) {
     response.json(newFact);
     return sendEventsToChat(newFact, chatId); // Send message to the specific chat
 }
-// async function addFact(request, response, next) {
-//     const { text, userId, chatId, messageId } = request.body;
-
-//     // Find the current receiver based on chatId and exclude the sender (userId)
-//     const currentReceiver = users.find((u) => {
-//         // Exclude the sender (userId) and find the user with the specified chatId
-//         return u.id !== userId && u.chats.some((chat) => chat === chatId);
-//     });
-//     console.log(currentReceiver);
-//     if (!currentReceiver) {
-//         return response.status(404).json({ error: "Receiver not found" });
-//     }
-
-//     const receiverId = currentReceiver.id;
-//     const newFact = { text, userId, receiverId, chatId, messageId };
-
-//     facts.push(newFact);
-//     response.json(newFact);
-
-//     // Send message to the specific chat
-//     return sendEventsToChat(newFact, chatId);
-
-//     // You may want to handle errors in sendEventsToChat function as well
-// }
 
 function sendEventsToChat(newFact, chatId) {
     clients.forEach((client) => {
@@ -226,7 +203,6 @@ function addChat(req, res) {
         id: chatId,
         name: userToAddChat.name,
     };
-    // TODO also find the user and contact and set chat on true
     const setChatToTrueContact = contactToAddChat.contacts.find((c) => c.id === userToAddChat.id);
     const setChatToTrueUser = userToAddChat.contacts.find((c) => c.id === contactToAddChat.id);
     setChatToTrueContact.existingChat = true;
@@ -236,7 +212,6 @@ function addChat(req, res) {
     contactToAddChat.chats.push(newChatContact);
 
     // Redirect to the chat page
-    // TODO This redirect doet het gewoon
     return res.redirect(`/account/${userToAddChat.id}/chat/${chatId}`);
 }
 
