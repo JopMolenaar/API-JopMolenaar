@@ -36,7 +36,7 @@
     <section>
       <h2>Add contact</h2>
       {% comment %} Look if the js is working with js? {% endcomment %}
-      <form action="/addContact" method="post">
+      <form action="/addContact" id="addContact" method="post">
         <label>Name:
           <input type="text" name="name">
         </label>
@@ -45,7 +45,6 @@
       </form>
     </section>
 </main>
-  {% comment %} <script src="fetchFriendReq"></script> {% endcomment %}
-  {% comment %} <script src="/js/extraFunctions.js"></script> {% endcomment %}
-  {% comment %} <script src="/js/addContact.js"></script> {% endcomment %}
+<script src="/js/extraFunctions.js"></script>
+<script src="/js/addContact.js"></script>
 {% endblock %}

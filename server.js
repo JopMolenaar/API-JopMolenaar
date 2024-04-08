@@ -153,8 +153,9 @@ async function addFact(request, response, next) {
     const receiverId = currentReceiver.id;
     const newFact = { text, userId, receiverId, from, chatId, messageId }; // Include receiverId in the newFact object
     facts.push(newFact);
-    response.json(newFact);
-    return sendEventsToChat(newFact, chatId); // Send message to the specific chat
+    // response.json(newFact);
+    sendEventsToChat(newFact, chatId); // Send message to the specific chat
+    return { newFact, redirect: `/account/${userId}/chat/${chatId}` };
 }
 
 function sendEventsToChat(newFact, chatId) {
@@ -217,10 +218,8 @@ function addContact(req, res) {
     const contactToAdd = users.find((u) => u.name === name);
 
     if (!userToAddContact || !contactToAdd) {
-        // return res.status(404).send("User or contact not found");
         const errorMessage = encodeURIComponent("User or contact not found");
-        return res.redirect(`/account/${userId}?error=${errorMessage}`);
-        // return res.send(renderTemplate("src/views/index.liquid", { page: "Log-in", errorMessage: "User not found" }));
+        return { status: 400, message: "User or contact not found", error: true };
     }
     const contactExists = userToAddContact.contacts.find((c) => c === contactToAdd.id);
     const contactExistsInContact = contactToAdd.contacts.find((c) => c === userToAddContact.id);
@@ -239,11 +238,10 @@ function addContact(req, res) {
         userToAddContact.contacts.push(newContactForUser);
         contactToAdd.contacts.push(newContact);
     } else {
-        return res.status(400).send("Contact already exists");
+        return { status: 400, message: "Contact already exists", error: true };
     }
 
-    // return res.status(201).send(`Contact added successfully: ${contactToAdd.name} & ${userToAddContact.name} are now contacts`);
-    return res.redirect(`/account/${userId}`);
+    return { status: 201, message: "contact added succesfully", userId: userToAddContact.id, contactId: contactToAdd.id, contactName: contactToAdd.name };
 }
 
 function addChat(req, res) {
@@ -257,8 +255,6 @@ function addChat(req, res) {
     }
 
     // Generate a random 10-digit ID for the chat
-    // const chatId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
-    // chats.push(chatId)
     const chatId = generateUniqueId(chats);
     chats.push({ id: chatId });
     const newChatUser = {
@@ -328,12 +324,13 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
     if (currentUser && currentContact) {
         let allChats = [];
+        console.log("facts:", facts);
         facts.forEach((fact) => {
             if (fact.chatId === chatId) {
                 allChats.push(fact);
             }
         });
-        return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats }));
+        return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats, currentUser, chatId }));
     } else {
         return res.send(renderTemplate("src/views/notFound.liquid"));
     }
@@ -363,10 +360,36 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
 ////////// app.post ///////////
 ///////////////////////////////
 
-app.post("/fact", addFact);
+app.post("/fact", async (req, res) => {
+    const response = await addFact(req, res);
+    console.log(response);
+    res.json(response.newFact);
+});
+app.post("/addMessageWithRefresh", async (req, res) => {
+    const { text, userId, chatId, messageId } = req.body;
+    const response = await addFact(req, res);
+    console.log(response);
+    return res.redirect(`/account/${userId}/chat/${chatId}`);
+});
+
 app.post("/makeAccount", addUser);
 app.post("/loginInAccount", verifyUser);
-app.post("/addContact", addContact);
+
+app.post("/addContact", async (req, res) => {
+    const { contact, userId } = req.body;
+    const response = await addContact(req, res);
+    if (response.error) {
+        const errorMessage = encodeURIComponent(response.message);
+        return res.redirect(`/account/${userId}?error=${errorMessage}`);
+    } else {
+        return res.redirect(`/account/${userId}`);
+    }
+});
+app.post("/addContactJs", async (req, res) => {
+    const response = await addContact(req, res);
+    console.log(response);
+    return res.status(200).send(response);
+});
 app.post("/addChat", addChat);
 
 ///////////////////////////////

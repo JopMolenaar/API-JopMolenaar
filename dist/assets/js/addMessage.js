@@ -1,11 +1,9 @@
-// TODO als je js uitstaat, send dan een request naar iets die het hetzelfde doet op de backend, ]
-// maar de pagina refreshed en dus de berichten weer laad uit de database
-
 const userId = getIdFromUrl("account");
 const chatId = getIdFromUrl("chat");
 const eventList = document.querySelector(".message-box");
-
-// fillInPrevMessages();
+const textForm = document.querySelector(".textForm");
+textForm.removeAttribute("action", "");
+textForm.removeAttribute("method", "");
 
 const evtSource = new EventSource(`/events/${userId}`);
 
@@ -36,7 +34,7 @@ evtSource.onmessage = (event) => {
     }
 };
 
-document.querySelector(".textForm").addEventListener("submit", async (event) => {
+textForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const messageId = Math.random();
     const text = document.getElementById("textInput").value;
@@ -54,6 +52,3 @@ document.querySelector(".textForm").addEventListener("submit", async (event) => 
         console.error("Failed to send text");
     }
 });
-
-
-// localStorage.clear();

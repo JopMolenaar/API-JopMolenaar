@@ -40,6 +40,10 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 - [x] maak de id als je een account aanmaakt een random nummer van 7 cijfers. Dan zijn de id’s in de url iets veiliger.
 - [x] error messages
 - [x] Some checks on the server like: checking if the generated id is really unique
+- [x] sending chats works without js and js is only for optimization
+- [x] adding a contact using js without refreshing the page
+
+- [ ] fetch the data on the server if you have a new contact and if a chat exists
 
 ### API’s
 

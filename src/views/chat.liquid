@@ -7,9 +7,11 @@
   </div>
   <h1>Send a message to {{ contact.name  }}</h1>
   <div class="chat-box">
-    {% comment %} method="" action="/fact" // TODO laten werken zonder js? {% endcomment %}
-    <form  class="textForm">
-      <input type="text" id="textInput" placeholder="Enter text">
+    <form action="/addMessageWithRefresh" method="post" class="textForm">
+      <input type="text" name="text" id="textInput" placeholder="Enter text">
+      <input type="hidden" name="messageId" value="0" >
+      <input type="hidden" name="chatId" value="{{ chatId }}">
+      <input type="hidden" name="userId" value="{{ currentUser.id }}">
       <button type="submit">Send Text</button>
     </form>
     <ul class="message-box">
@@ -20,5 +22,5 @@
   </div>
 </main>
 <script src="/js/extraFunctions.js"></script>
-<script src="/js/script.js"></script>
+<script src="/js/addMessage.js"></script>
 {% endblock %}
