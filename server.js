@@ -15,7 +15,7 @@ const engine = new Liquid({
 
 const app = express();
 
-app.use(sirv("dist/assets")); // change this to normal files with css and js
+app.use(sirv("static")); // change this to normal files with css and js
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
