@@ -15,7 +15,7 @@ const engine = new Liquid({
 
 const app = express();
 
-app.use(sirv("static")); // change this to normal files with css and js
+app.use(sirv("static"));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -153,7 +153,6 @@ async function addFact(request, response, next) {
     const receiverId = currentReceiver.id;
     const newFact = { text, userId, receiverId, from, chatId, messageId }; // Include receiverId in the newFact object
     facts.push(newFact);
-    // response.json(newFact);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
     return { newFact, redirect: `/account/${userId}/chat/${chatId}` };
 }
@@ -359,6 +358,20 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
 ///////////////////////////////
 ////////// app.post ///////////
 ///////////////////////////////
+
+app.post("/checkForChat", (req, res) => {
+    let dataToReturn = [];
+    const allData = req.body;
+    if (allData[0]) {
+        allData.forEach((data) => {
+            const foundUser = users.find((u) => u.id === data.user);
+            const foundContact = foundUser.contacts.find((c) => c.id === data.contact);
+            dataToReturn.push({ chat: foundContact.existingChat, contact: data.contact });
+        });
+        return res.status(200).send({ message: "content send", data: dataToReturn });
+    }
+    return res.status(200).send({ message: "no content send" });
+});
 
 app.post("/fact", async (req, res) => {
     const response = await addFact(req, res);
