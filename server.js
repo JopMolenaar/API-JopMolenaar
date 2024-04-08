@@ -35,6 +35,11 @@ app.listen(PORT, () => {
 ///////// Stored data /////////
 ///////////////////////////////
 let clients = [];
+let chats = [
+    {
+        id: "3889220298",
+    },
+];
 let users = [
     {
         id: "65956570",
@@ -172,6 +177,15 @@ function sendEventsToChat(newFact, chatId) {
     });
 }
 
+function generateUniqueId(array) {
+    let id;
+    do {
+        // Generate a random 8-digit ID
+        id = Math.floor(10000000 + Math.random() * 90000000).toString();
+    } while (array.some((element) => element.id === id)); // Check if ID already exists in users array
+    return id;
+}
+
 function addUser(req, res) {
     const { name } = req.body;
     // Check if the user already exists
@@ -180,9 +194,8 @@ function addUser(req, res) {
         return res.send(renderTemplate("src/views/index.liquid", { page: "Sign-up", errorMessage: `User: ${name} already exists`, inputValue: name }));
     }
 
-    // Generate a random 8-digit ID
-    const id = Math.floor(10000000 + Math.random() * 90000000).toString();
-
+    // Generate a unique ID for the new user
+    const id = generateUniqueId(users);
     const newUser = {
         id: id,
         name: name,
@@ -244,7 +257,10 @@ function addChat(req, res) {
     }
 
     // Generate a random 10-digit ID for the chat
-    const chatId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    // const chatId = Math.floor(1000000000 + Math.random() * 9000000000).toString();
+    // chats.push(chatId)
+    const chatId = generateUniqueId(chats);
+    chats.push({ id: chatId });
     const newChatUser = {
         id: chatId,
         name: contactToAddChat.name,
@@ -311,15 +327,12 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     const currentUser = users.find((u) => u.id === clientId);
     const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
     if (currentUser && currentContact) {
-        // console.log(facts);
-        // const newFact = { text, userId, receiverId, from, chatId, messageId };
         let allChats = [];
         facts.forEach((fact) => {
             if (fact.chatId === chatId) {
                 allChats.push(fact);
             }
         });
-        // console.log(allChats);
         return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats }));
     } else {
         return res.send(renderTemplate("src/views/notFound.liquid"));

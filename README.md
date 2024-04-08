@@ -38,6 +38,8 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 - [x] adding contacts en opslaan op de server
 - [x] messages opslaan op de server
 - [x] maak de id als je een account aanmaakt een random nummer van 7 cijfers. Dan zijn de id’s in de url iets veiliger.
+- [x] error messages
+- [x] Some checks on the server like: checking if the generated id is really unique
 
 ### API’s
 
