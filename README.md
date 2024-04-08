@@ -6,8 +6,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 
 ## Process
 
-[Link to process (Dutch) ]()
-<!-- update when the blog is online -->
+[Link to process (Dutch) ](https://processjournal-jopmolenaar.onrender.com/processAPI)
 
 ## Table of contents
 
@@ -21,11 +20,27 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 1. Clone the repository:
 
     ```
-    git clone 
+    git clone https://github.com/JopMolenaar/API-JopMolenaar.git
     ```
+2. Navigate to the project directory:
 
-2. Open the cloned file with your code editor and start coding!
+   ```
+   cd myApp
+   ```
 
+3. Install the dependencies:
+
+   ```
+   npm install
+   ```
+
+4. Start the application:
+
+   ```
+   npm run dev
+   ```
+
+   The application will be accessible at `http://localhost:4000`.
 
 ## Use of features
 
@@ -42,8 +57,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 - [x] Some checks on the server like: checking if the generated id is really unique
 - [x] sending chats works without js and js is only for optimization
 - [x] adding a contact using js without refreshing the page
-
-- [ ] fetch the data on the server if you have a new contact and if a chat exists
+- [ ] fetch the data on the server to see if you have a new contact and if a chat exists
 
 ### API’s
 
@@ -53,8 +67,9 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 ### Extra 
 
 - [ ] learn more about builders, use one and upgrade the performance.
-- Maak chat groepen 
+- [ ] Make chatgroups 
 - [ ] have a nice styling 
+- [ ] Online status next to the name of the contact in the chat
 
 ### Extra extra:
 
