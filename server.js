@@ -20,10 +20,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/status", (request, response) => {
-    console.log(clients);
-    response.json({ clients: clients, facts: facts });
-});
+app.get("/status", (request, response) => response.json({ users: users, facts: facts }));
 app.get("/showUsers", (request, response) => response.json({ users: users }));
 
 // TODO add password in data and make a session id?
@@ -37,11 +34,61 @@ app.listen(PORT, () => {
 ///////////////////////////////
 ///////// Stored data /////////
 ///////////////////////////////
-
-let users = [];
 let clients = [];
-// TODO Load data with the messages that are in this data array
-let facts = [];
+let users = [
+    {
+        id: "65956570",
+        name: "Mink",
+        chats: [
+            {
+                id: "3889220298",
+                name: "Jop",
+            },
+        ],
+        contacts: [
+            {
+                id: "37157981",
+                name: "Jop",
+                existingChat: true,
+            },
+        ],
+    },
+    {
+        id: "37157981",
+        name: "Jop",
+        chats: [
+            {
+                id: "3889220298",
+                name: "Mink",
+            },
+        ],
+        contacts: [
+            {
+                id: "65956570",
+                name: "Mink",
+                existingChat: true,
+            },
+        ],
+    },
+];
+let facts = [
+    {
+        text: "Hoi Mink",
+        userId: "37157981",
+        receiverId: "65956570",
+        from: "Jop",
+        chatId: "3889220298",
+        messageId: 0.148236156069004,
+    },
+    {
+        text: "Hoi Jop",
+        userId: "65956570",
+        receiverId: "37157981",
+        from: "Mink",
+        chatId: "3889220298",
+        messageId: 0.891413494111438,
+    },
+];
 
 ///////////////////////////////
 ////////// Functions //////////
@@ -130,7 +177,7 @@ function addUser(req, res) {
     // Check if the user already exists
     const existingUser = users.find((user) => user.name === name);
     if (existingUser) {
-        return res.status(400).send("User already exists");
+        return res.send(renderTemplate("src/views/index.liquid", { page: "Sign-up", errorMessage: `User: ${name} already exists`, inputValue: name }));
     }
 
     // Generate a random 8-digit ID
@@ -147,18 +194,20 @@ function addUser(req, res) {
     console.log("All users:", users);
 
     // Redirect to the account page of the new added user
-    // return res.redirect(`/account/${id}`);
-    return res.status(200).send(`/account/${id}`);
+    return res.redirect(`/account/${id}`);
 }
 
 function addContact(req, res) {
-    const { contact, userId } = req.body;
-    console.log(contact, userId);
+    const { name, userId } = req.body;
+    console.log(name, userId);
     const userToAddContact = users.find((u) => u.id === userId);
-    const contactToAdd = users.find((u) => u.name === contact);
+    const contactToAdd = users.find((u) => u.name === name);
 
     if (!userToAddContact || !contactToAdd) {
-        return res.status(404).send("User or contact not found");
+        // return res.status(404).send("User or contact not found");
+        const errorMessage = encodeURIComponent("User or contact not found");
+        return res.redirect(`/account/${userId}?error=${errorMessage}`);
+        // return res.send(renderTemplate("src/views/index.liquid", { page: "Log-in", errorMessage: "User not found" }));
     }
     const contactExists = userToAddContact.contacts.find((c) => c === contactToAdd.id);
     const contactExistsInContact = contactToAdd.contacts.find((c) => c === userToAddContact.id);
@@ -180,7 +229,8 @@ function addContact(req, res) {
         return res.status(400).send("Contact already exists");
     }
 
-    return res.status(201).send(`Contact added successfully: ${contactToAdd.name} & ${userToAddContact.name} are now contacts`);
+    // return res.status(201).send(`Contact added successfully: ${contactToAdd.name} & ${userToAddContact.name} are now contacts`);
+    return res.redirect(`/account/${userId}`);
 }
 
 function addChat(req, res) {
@@ -219,10 +269,9 @@ function verifyUser(req, res) {
     const { name } = req.body;
     const existingUser = users.find((user) => user.name === name);
     if (!existingUser) {
-        return res.status(400).send("User doesn't exists");
+        return res.send(renderTemplate("src/views/index.liquid", { page: "Log-in", errorMessage: `User: ${name} doesn't exists`, inputValue: name }));
     }
-    // return res.redirect(`/account/${existingUser.id}`);
-    return res.status(200).send(`/account/${existingUser.id}`);
+    return res.redirect(`/account/${existingUser.id}`);
 }
 
 ///////////////////////////////
@@ -238,6 +287,7 @@ app.get("/signup", async (req, res) => {
 });
 
 app.get("/account/:id", async (req, res) => {
+    const error = req.query.error; // Retrieve error message from query parameter
     const clientId = req.params.id;
     let currentUser;
     if (!users[0]) {
@@ -245,6 +295,9 @@ app.get("/account/:id", async (req, res) => {
     } else {
         currentUser = users.find((u) => u.id === clientId);
         if (currentUser !== undefined) {
+            if (error) {
+                return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, error }));
+            }
             return res.send(renderTemplate("src/views/account.liquid", { user: currentUser }));
         } else {
             return res.send(renderTemplate("src/views/notFound.liquid"));
@@ -258,8 +311,16 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     const currentUser = users.find((u) => u.id === clientId);
     const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
     if (currentUser && currentContact) {
-        // TODO get all stored chats from that chat
-        return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact }));
+        // console.log(facts);
+        // const newFact = { text, userId, receiverId, from, chatId, messageId };
+        let allChats = [];
+        facts.forEach((fact) => {
+            if (fact.chatId === chatId) {
+                allChats.push(fact);
+            }
+        });
+        // console.log(allChats);
+        return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats }));
     } else {
         return res.send(renderTemplate("src/views/notFound.liquid"));
     }

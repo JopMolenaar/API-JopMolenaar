@@ -2,6 +2,9 @@
 
 {% block content %}
 <main>
+  {% if error %}
+    <p>{{ error }}</p>
+  {% endif %}
     <div>
       <a href="/login">Log out</a>
     </div>
@@ -32,14 +35,17 @@
     </div>
     <section>
       <h2>Add contact</h2>
-      <form action="#" id="addContact">
+      {% comment %} Look if the js is working with js? {% endcomment %}
+      <form action="/addContact" method="post">
         <label>Name:
           <input type="text" name="name">
         </label>
+        <input type="hidden" name="userId" value="{{ user.id }}">
         <button type="submit">Add contact</button>
       </form>
     </section>
 </main>
-  <script src="/js/extraFunctions.js"></script>
-  <script src="/js/loginSignup.js"></script>
+  {% comment %} <script src="fetchFriendReq"></script> {% endcomment %}
+  {% comment %} <script src="/js/extraFunctions.js"></script> {% endcomment %}
+  {% comment %} <script src="/js/addContact.js"></script> {% endcomment %}
 {% endblock %}

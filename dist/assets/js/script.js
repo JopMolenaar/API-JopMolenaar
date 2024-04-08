@@ -5,12 +5,11 @@ const userId = getIdFromUrl("account");
 const chatId = getIdFromUrl("chat");
 const eventList = document.querySelector(".message-box");
 
-fillInPrevMessages();
+// fillInPrevMessages();
 
 const evtSource = new EventSource(`/events/${userId}`);
 
 evtSource.onmessage = (event) => {
-    console.log("got message now");
     const message = JSON.parse(event.data);
     if (message.text !== undefined) {
         const newElement = document.createElement("li");

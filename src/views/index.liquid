@@ -2,16 +2,23 @@
 
 {% block content %}
 <main>
+  {% if errorMessage %}
+    <p>{{ errorMessage }}</p>
+  {% endif %}
   <h1> {{ page }}</h1>
-  <form action="#"
+  <form
     {% if page == "Sign-up" %}
-      id="signUp"
+      action="/makeAccount" method="post"
     {% else if page == "Log-in"  %}
-      id="logIn"
+      action="/loginInAccount" method="post"
     {% endif %}
   >
     <label>Name:
-      <input type="text" name="name">
+      {% if inputValue %}
+        <input type="text" name="name" value="{{ inputValue }}">
+        {% else %}
+        <input type="text" name="name">
+      {% endif %}
     </label>
     <button type="submit">{{ page }}</button>
   </form>
@@ -22,7 +29,5 @@
   <a href="/signup">I dont have a account yet.</a>
 {% endif %}
 </main>
-<script src="/js/extraFunctions.js"></script>
-<script src="/js/loginSignup.js"></script>
 {% endblock %}
 
