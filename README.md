@@ -2,7 +2,7 @@
 
 ## Description
 
-<!--   -->
+I wanted to make a chat app like WhatsApp or another app with a chat feature. 
 
 ## Process
 
@@ -30,6 +30,29 @@
 ## Use of features
 
 ## Ideas/checklist
+
+### Quick fix
+
+- [x] Be able to chat to people 
+- [x] making accounts en opslaan op de server
+- [x] adding contacts en opslaan op de server
+- [x] messages opslaan op de server
+- [x] maak de id als je een account aanmaakt een random nummer van 7 cijfers. Dan zijn de id’s in de url iets veiliger.
+
+### API’s
+
+- [ ] using the api that allows it to place the webapp on your mobile front screen without a browser bar and with a logo as logo. 
+- [ ] getting notifications (api)
+
+### Extra 
+
+- [ ] learn more about builders, use one and upgrade the performance.
+- Maak chat groepen 
+- [ ] have a nice styling 
+
+### Extra extra:
+
+- [ ] Sla data op in json zodat als de server restart de data niet weg is. 
 
 ## License
 
