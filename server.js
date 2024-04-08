@@ -147,7 +147,8 @@ function addUser(req, res) {
     console.log("All users:", users);
 
     // Redirect to the account page of the new added user
-    return res.redirect(`/account/${id}`);
+    // return res.redirect(`/account/${id}`);
+    return res.status(200).send(`/account/${id}`);
 }
 
 function addContact(req, res) {
@@ -220,7 +221,8 @@ function verifyUser(req, res) {
     if (!existingUser) {
         return res.status(400).send("User doesn't exists");
     }
-    return res.redirect(`/account/${existingUser.id}`);
+    // return res.redirect(`/account/${existingUser.id}`);
+    return res.status(200).send(`/account/${existingUser.id}`);
 }
 
 ///////////////////////////////
