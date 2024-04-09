@@ -367,27 +367,12 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
 //     if (allData[0]) {
 //         allData.forEach((data) => {
 //             const foundUser = users.find((u) => u.id === data.user);
-//             console.log("FOUND USER:", foundUser.name, "DATA CONTACT:", data);
+//             console.log("FOUND USER:", foundUser.name, "LI DATA CONTACTS:", data);
 //             let foundContact;
 //             if (data.contact) {
-//                 foundContact = foundUser.contacts.find((c) => c.id === data.contact);
-//                 console.log(foundContact);
-//                 dataToReturn.push({ chat: foundContact.existingChat, contact: data.contact });
-//             } else if (Array.isArray(data.name)) {
-//                 let newContactArray = [];
-//                 data.name.forEach((name) => {
-//                     const newContact = foundUser.contacts.find((c) => c.name !== name);
-//                     newContactArray.push(newContact);
-//                 });
-//                 // Check if there is a new chat
-//                 if (newContactArray[0]) {
-//                     // console.log(newContactArray);
-//                     dataToReturn.push({ message: "New contact", contact: newContactArray });
-//                 } else {
-//                     dataToReturn.push({ message: "No new contact" });
-//                 }
+//                 // TODO check if there is an existing chat
 //             } else {
-//                 // let newContact;
+//                 // TODO check if there is a new contact
 //                 const newContact = foundUser.contacts.find((c) => c.name !== data.name);
 //                 if (newContact) {
 //                     dataToReturn.push({ message: "New contact", contact: newContact });
@@ -395,9 +380,10 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
 //                 } else {
 //                     dataToReturn.push({ message: "No new contact" });
 //                 }
+//                 return res.status(200).send({ dataToReturn });
 //             }
 //         });
-//         return res.status(200).send({ message: "content send", data: dataToReturn });
+//         return res.status(200).send({ message: "content send" });
 //     }
 //     return res.status(200).send({ message: "no content send" });
 // });
