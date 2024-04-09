@@ -84,5 +84,5 @@ contactForm.addEventListener("submit", async (event) => {
 //     }
 // }
 
-checkForChat();
-setInterval(checkForChat, 5000);
+// checkForChat();
+// setInterval(checkForChat, 5000);
