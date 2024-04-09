@@ -215,7 +215,9 @@ function addContact(req, res) {
     console.log(name, userId);
     const userToAddContact = users.find((u) => u.id === userId);
     const contactToAdd = users.find((u) => u.name === name);
-
+    if (contactToAdd === userToAddContact) {
+        return { status: 400, message: "You cant add yourself", error: true };
+    }
     if (!userToAddContact || !contactToAdd) {
         const errorMessage = encodeURIComponent("User or contact not found");
         return { status: 400, message: "User or contact not found", error: true };
@@ -359,19 +361,46 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
 ////////// app.post ///////////
 ///////////////////////////////
 
-app.post("/checkForChat", (req, res) => {
-    let dataToReturn = [];
-    const allData = req.body;
-    if (allData[0]) {
-        allData.forEach((data) => {
-            const foundUser = users.find((u) => u.id === data.user);
-            const foundContact = foundUser.contacts.find((c) => c.id === data.contact);
-            dataToReturn.push({ chat: foundContact.existingChat, contact: data.contact });
-        });
-        return res.status(200).send({ message: "content send", data: dataToReturn });
-    }
-    return res.status(200).send({ message: "no content send" });
-});
+// app.post("/checkForChat", (req, res) => {
+//     let dataToReturn = [];
+//     const allData = req.body;
+//     if (allData[0]) {
+//         allData.forEach((data) => {
+//             const foundUser = users.find((u) => u.id === data.user);
+//             console.log("FOUND USER:", foundUser.name, "DATA CONTACT:", data);
+//             let foundContact;
+//             if (data.contact) {
+//                 foundContact = foundUser.contacts.find((c) => c.id === data.contact);
+//                 console.log(foundContact);
+//                 dataToReturn.push({ chat: foundContact.existingChat, contact: data.contact });
+//             } else if (Array.isArray(data.name)) {
+//                 let newContactArray = [];
+//                 data.name.forEach((name) => {
+//                     const newContact = foundUser.contacts.find((c) => c.name !== name);
+//                     newContactArray.push(newContact);
+//                 });
+//                 // Check if there is a new chat
+//                 if (newContactArray[0]) {
+//                     // console.log(newContactArray);
+//                     dataToReturn.push({ message: "New contact", contact: newContactArray });
+//                 } else {
+//                     dataToReturn.push({ message: "No new contact" });
+//                 }
+//             } else {
+//                 // let newContact;
+//                 const newContact = foundUser.contacts.find((c) => c.name !== data.name);
+//                 if (newContact) {
+//                     dataToReturn.push({ message: "New contact", contact: newContact });
+//                     console.log("NEW CONTACT:", newContact);
+//                 } else {
+//                     dataToReturn.push({ message: "No new contact" });
+//                 }
+//             }
+//         });
+//         return res.status(200).send({ message: "content send", data: dataToReturn });
+//     }
+//     return res.status(200).send({ message: "no content send" });
+// });
 
 app.post("/fact", async (req, res) => {
     const response = await addFact(req, res);

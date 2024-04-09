@@ -13,7 +13,7 @@
         <h2>Contacts</h2>
         <ul class="contacts">
             {% for contact in user.contacts %}
-                <li> {{ contact.name }}
+                <li>{{ contact.name }}
                   {% if contact.existingChat == false %}
                     <form action="/addChat" method="post">
                     <input type="hidden" name="user" value="{{ user.id }}">
@@ -27,7 +27,7 @@
     </div>
     <div>
       <h2>Chats</h2>
-      <ul>
+      <ul class="chats">
         {% for chat in user.chats %}
           <li>Chat with: <a href="/account/{{ user.id }}/chat/{{ chat.id }}"> {{ chat.name }}</a></li>
         {% endfor %} 

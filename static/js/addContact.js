@@ -31,41 +31,62 @@ contactForm.addEventListener("submit", async (event) => {
     }
 });
 
-// Fetch the data and look if there is made a chat
-
 async function checkForChat() {
-    // console.log("checkForChat");
-    let allLiData = [];
+    const allLiData = [];
     const allIds = contactList.querySelectorAll("li");
+
     allIds.forEach((li) => {
         const user = li.querySelector("input[name=user]");
         const contact = li.querySelector("input[name=contact]");
+
         if (user && contact) {
-            const data = { user: user.value, contact: contact.value };
+            const data = { user: user.value, contact: contact.value, name: li.textContent.trim() };
             allLiData.push(data);
+        } else {
+            const textContentWithoutSpaces = li.textContent.trim().replace(/\s+/g, " ");
+            allLiData.push({ name: textContentWithoutSpaces, user: userId });
         }
     });
-    if (allLiData[0]) {
-        const response = await fetch("/checkForChat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            // get the user from the url and send user id to the backend
-            body: JSON.stringify(allLiData),
-        });
-        const data = await response.json();
-        if (!data.error) {
-            if (data.data[0].chat) {
-                const input = document.querySelector(`input[value='${data.data[0].contact}']`);
-                const form = input.parentElement;
-                form.remove();
+
+    if (allLiData.length > 0) {
+        console.log(allLiData);
+        try {
+            const response = await fetch("/checkForChat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(allLiData),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
-        } else {
-            console.error(`There is an error: ${data.message}`);
-            // TODO show error message
+
+            const data = await response.json();
+            const theActdata = data.data[0];
+            console.log(theActdata);
+
+            if (theActdata.message === "New contact") {
+                console.log("NEW:", theActdata.contact);
+                const html = `<li>${theActdata.contact.name}
+                                 <form action="/addChat" method="post">
+                                  <input type="hidden" name="user" value="${userId}">
+                                     <input type="hidden" name="contact" value="${theActdata.contact.id}">
+                            <button type="submit">New chat</button>
+                                  </form>
+                              </li>`;
+                contactList.insertAdjacentHTML("beforeend", html);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error.message);
+            // TODO: Handle error message display
         }
+    } else {
+        console.log("No data to send to server");
+        // TODO: Handle scenario where no data is available to send
     }
 }
+
 checkForChat();
-setInterval(checkForChat, 1000);
+setInterval(checkForChat, 5000);
