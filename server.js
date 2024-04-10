@@ -8,6 +8,14 @@ const { Liquid } = require("liquidjs");
 const sirv = require("sirv");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const webpush = require("web-push");
+
+const vapidKeys = {
+    publicKey: "BNvTbER8XgCTGxnGOVRLnnCfHA5WdTfe51CEHtGBAVeJuDbtsGjojizJIe-hgDbNda_zevi3cv_mf9Z642JcqP8",
+    privateKey: process.env.PRIVATE_VAPID_KEY,
+};
+
+webpush.setVapidDetails(`mailto:${process.env.MAIL}`, vapidKeys.publicKey, vapidKeys.privateKey);
 
 const engine = new Liquid({
     extname: ".liquid",
@@ -287,6 +295,27 @@ function verifyUser(req, res) {
     return res.redirect(`/account/${existingUser.id}`);
 }
 
+function isValidSaveRequest(req, res) {
+    console.log("VALIDATE");
+    // Check the request body has at least an endpoint.
+    if (!req.body || !req.body.endpoint) {
+        console.log("FALSE");
+        // Not a valid subscription.
+        res.status(400);
+        res.setHeader("Content-Type", "application/json");
+        res.send(
+            JSON.stringify({
+                error: {
+                    id: "no-endpoint",
+                    message: "Subscription must have an endpoint.",
+                },
+            })
+        );
+        return false;
+    }
+    return true;
+}
+
 ///////////////////////////////
 /////////// app.get ///////////
 ///////////////////////////////
@@ -419,6 +448,100 @@ app.post("/addContactJs", async (req, res) => {
     return res.status(200).send(response);
 });
 app.post("/addChat", addChat);
+
+app.post("/save-subscription", function (req, res) {
+    if (!isValidSaveRequest(req, res)) {
+        return;
+    }
+    try {
+        // const subscriptionData = JSON.parse(req.body);
+        // console.log(subscriptionData);
+        return saveSubscriptionToDatabase(req.body)
+            .then((subscriptionId) => {
+                res.setHeader("Content-Type", "application/json");
+                res.send(JSON.stringify({ data: { success: true } }));
+            })
+            .catch(function (err) {
+                res.status(500);
+                res.setHeader("Content-Type", "application/json");
+                res.send(
+                    JSON.stringify({
+                        error: {
+                            id: "unable-to-save-subscription",
+                            message: "The subscription was received but we were unable to save it to our database.",
+                        },
+                    })
+                );
+            });
+    } catch (error) {
+        // Handle JSON parsing error
+        console.error("Error parsing JSON:", error.message);
+        res.status(400).send("Invalid JSON data");
+    }
+});
+
+let allSubscribers = [];
+
+function saveSubscriptionToDatabase(subscription) {
+    console.log("SAVE SUB");
+    return new Promise((resolve, reject) => {
+        const id = generateUniqueId(allSubscribers);
+        const newSubscriber = {
+            subscription: subscription,
+            id: id,
+        };
+        allSubscribers.push(newSubscriber);
+        resolve(id); // Resolve with the generated ID
+        // In a real scenario, you would typically save to a database here and resolve with the ID once saved.
+        // Example using a database library:
+        // db.insert(subscription, function(err, newDoc) {
+        //     if (err) {
+        //         reject(err);
+        //     } else {
+        //         resolve(newDoc._id);
+        //     }
+        // });
+    });
+}
+
+app.post("/trigger-push-msg", function (req, res) {
+    const { title, body, icon } = req.body;
+    const dataToSend = { notification: { title, body, icon } };
+    const payload = JSON.stringify(dataToSend);
+    return getSubscriptionsFromDatabase().then(function (subscriptions) {
+        let promiseChain = Promise.resolve();
+
+        for (let i = 0; i < subscriptions.length; i++) {
+            const subscription = subscriptions[i];
+            promiseChain = promiseChain.then(() => {
+                return triggerPushMsg(subscription, payload);
+            });
+        }
+
+        return promiseChain;
+    });
+});
+
+function getSubscriptionsFromDatabase() {
+    console.log("GET SUB");
+    return new Promise((resolve, reject) => {
+        resolve(allSubscribers);
+    });
+}
+
+const triggerPushMsg = function (subscription, dataToSend) {
+    console.log("TRIGGER PUSH MSG", subscription.subscription, dataToSend);
+    return webpush.sendNotification(subscription.subscription, dataToSend).catch((err) => {
+        if (err.statusCode === 410) {
+            console.log("ERROR", err.statusCode, "ID", subscription._id);
+            // return deleteSubscriptionFromDatabase(subscription._id);
+            return "Error";
+        } else {
+            console.log("ERROR STATUS CODE:", err.statusCode);
+            console.log("Subscription is no longer valid: ", err);
+        }
+    });
+};
 
 ///////////////////////////////
 ///// extra shit comments /////
