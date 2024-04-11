@@ -162,6 +162,7 @@ async function addFact(request, response, next) {
     const newFact = { text, userId, receiverId, from, chatId, messageId }; // Include receiverId in the newFact object
     facts.push(newFact);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
+    // TODO sendPushNoti(request.body, receiverId);
     return { newFact, redirect: `/account/${userId}/chat/${chatId}` };
 }
 
@@ -316,11 +317,18 @@ function isValidSaveRequest(req, res) {
     return true;
 }
 
-function getSubscriptionsFromDatabase() {
+function getSubscriptionsFromDatabase(id) {
     console.log("GET SUB");
+    let subscribersToResolve = [];
     return new Promise((resolve, reject) => {
         console.log("allSubscribers: ", allSubscribers);
-        resolve(allSubscribers);
+        allSubscribers.forEach((sub) => {
+            console.log(sub.id, id);
+            if (sub.userId === id) {
+                subscribersToResolve.push(sub);
+            }
+        });
+        resolve(subscribersToResolve);
     });
 }
 
@@ -352,13 +360,14 @@ function saveSubscriptionToDatabase(subscription, userId) {
     });
 }
 
-function sendPushNoti(data) {
+function sendPushNoti(data, sendTo) {
     // const { title, body, icon, userId } = data;
     const { text, userId, icon } = data;
     const dataToSend = { title: "Message from someone", body: text, icon };
     const payload = JSON.stringify(dataToSend);
     // TODO = logic to send it to the right person if that person is not online
-    return getSubscriptionsFromDatabase().then(function (subscriptions) {
+    return getSubscriptionsFromDatabase(sendTo).then(function (subscriptions) {
+        console.log("SUBS:", subscriptions);
         let promiseChain = Promise.resolve();
         let doubleDev = [];
         for (let i = 0; i < subscriptions.length; i++) {
