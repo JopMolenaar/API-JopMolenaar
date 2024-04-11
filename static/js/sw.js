@@ -70,21 +70,27 @@ function subscribeUserToPush() {
             return registration.pushManager.subscribe(subscribeOptions);
         })
         .then(function (pushSubscription) {
-            console.log("Received PushSubscription: ", JSON.stringify(pushSubscription));
+            // console.log("Received PushSubscription: ", JSON.stringify(pushSubscription));
             const subscriptionObject = JSON.stringify(pushSubscription);
-            console.log(subscriptionObject);
+            // console.log(subscriptionObject);
             sendSubscriptionToBackEnd(subscriptionObject);
             return subscriptionObject;
         });
 }
 
 function sendSubscriptionToBackEnd(subscription) {
-    console.log(subscription);
-    return fetch("/save-subscription", {
+    const userId = getIdFromUrl("account");
+    console.log("account:", userId);
+    // subscription.userId = userId;
+    // console.log(subscription); // is really weird, // TODO find a way to link it with the userId
+    // console.log(subscription);
+    return fetch(`/save-subscription/${userId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
+        // body: JSON.stringify({ subscription, userId: userId }),
+        // body: JSON.stringify(subscription),
         body: subscription,
     })
         .then(function (response) {

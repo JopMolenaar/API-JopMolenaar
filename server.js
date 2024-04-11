@@ -28,7 +28,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get("/status", (request, response) => response.json({ users: users, facts: facts }));
+app.get("/status", (request, response) => response.json({ users: users, facts: facts, allSubscribers: allSubscribers }));
 app.get("/showUsers", (request, response) => response.json({ users: users }));
 
 // TODO add password in data and make a session id?
@@ -102,7 +102,7 @@ let facts = [
         messageId: 0.891413494111438,
     },
 ];
-
+let allSubscribers = [];
 ///////////////////////////////
 ////////// Functions //////////
 ///////////////////////////////
@@ -316,6 +316,67 @@ function isValidSaveRequest(req, res) {
     return true;
 }
 
+function getSubscriptionsFromDatabase() {
+    console.log("GET SUB");
+    return new Promise((resolve, reject) => {
+        console.log("allSubscribers: ", allSubscribers);
+        resolve(allSubscribers);
+    });
+}
+
+function triggerPushMsg(subscription, dataToSend) {
+    console.log("TRIGGER PUSH MSG", subscription.subscription, dataToSend);
+    return webpush.sendNotification(subscription.subscription, dataToSend).catch((err) => {
+        if (err.statusCode === 410) {
+            console.log("ERROR", err.statusCode, "ID", subscription._id);
+            // return deleteSubscriptionFromDatabase(subscription._id);
+            return "Error";
+        } else {
+            console.log("ERROR STATUS CODE:", err.statusCode);
+            console.log("Subscription is no longer valid: ", err);
+        }
+    });
+}
+
+function saveSubscriptionToDatabase(subscription, userId) {
+    console.log("SAVE SUB", userId);
+    return new Promise((resolve, reject) => {
+        const id = generateUniqueId(allSubscribers);
+        const newSubscriber = {
+            subscription: subscription,
+            id: id,
+            userId: userId,
+        };
+        allSubscribers.push(newSubscriber);
+        resolve(id); // Resolve with the generated ID
+    });
+}
+
+function sendPushNoti(data) {
+    // const { title, body, icon, userId } = data;
+    const { text, userId, icon } = data;
+    const dataToSend = { title: "Message from someone", body: text, icon };
+    const payload = JSON.stringify(dataToSend);
+    // TODO = logic to send it to the right person if that person is not online
+    return getSubscriptionsFromDatabase().then(function (subscriptions) {
+        let promiseChain = Promise.resolve();
+        let doubleDev = [];
+        for (let i = 0; i < subscriptions.length; i++) {
+            if (!doubleDev.includes(subscriptions[i].subscription.endpoint)) {
+                // TODO if subscription.subscription.endpoint already exists in a array, don't send it.
+                const subscription = subscriptions[i];
+                doubleDev.push(subscriptions[i].subscription.endpoint);
+                promiseChain = promiseChain.then(() => {
+                    return triggerPushMsg(subscription, payload);
+                });
+            }
+        }
+
+        // return promiseChain;
+        // redirect to the current chat page
+        // return res.redirect(`/account/${userId}`);
+    });
+}
 ///////////////////////////////
 /////////// app.get ///////////
 ///////////////////////////////
@@ -420,6 +481,7 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
 app.post("/fact", async (req, res) => {
     const response = await addFact(req, res);
     console.log(response);
+    // sendPushNoti(req.body);
     res.json(response.newFact);
 });
 app.post("/addMessageWithRefresh", async (req, res) => {
@@ -449,14 +511,19 @@ app.post("/addContactJs", async (req, res) => {
 });
 app.post("/addChat", addChat);
 
-app.post("/save-subscription", function (req, res) {
+app.post("/save-subscription/:id", function (req, res) {
+    const userId = req.params.id;
+    console.log(userId);
+    // const { userId, subscription } = req.body;
+    // console.log(req.body);
+    // console.log("User id:", userId);
     if (!isValidSaveRequest(req, res)) {
         return;
     }
     try {
         // const subscriptionData = JSON.parse(req.body);
         // console.log(subscriptionData);
-        return saveSubscriptionToDatabase(req.body)
+        return saveSubscriptionToDatabase(req.body, userId)
             .then((subscriptionId) => {
                 res.setHeader("Content-Type", "application/json");
                 res.send(JSON.stringify({ data: { success: true } }));
@@ -479,69 +546,6 @@ app.post("/save-subscription", function (req, res) {
         res.status(400).send("Invalid JSON data");
     }
 });
-
-let allSubscribers = [];
-
-function saveSubscriptionToDatabase(subscription) {
-    console.log("SAVE SUB");
-    return new Promise((resolve, reject) => {
-        const id = generateUniqueId(allSubscribers);
-        const newSubscriber = {
-            subscription: subscription,
-            id: id,
-        };
-        allSubscribers.push(newSubscriber);
-        resolve(id); // Resolve with the generated ID
-        // In a real scenario, you would typically save to a database here and resolve with the ID once saved.
-        // Example using a database library:
-        // db.insert(subscription, function(err, newDoc) {
-        //     if (err) {
-        //         reject(err);
-        //     } else {
-        //         resolve(newDoc._id);
-        //     }
-        // });
-    });
-}
-
-app.post("/trigger-push-msg", function (req, res) {
-    const { title, body, icon } = req.body;
-    const dataToSend = { notification: { title, body, icon } };
-    const payload = JSON.stringify(dataToSend);
-    return getSubscriptionsFromDatabase().then(function (subscriptions) {
-        let promiseChain = Promise.resolve();
-
-        for (let i = 0; i < subscriptions.length; i++) {
-            const subscription = subscriptions[i];
-            promiseChain = promiseChain.then(() => {
-                return triggerPushMsg(subscription, payload);
-            });
-        }
-
-        return promiseChain;
-    });
-});
-
-function getSubscriptionsFromDatabase() {
-    console.log("GET SUB");
-    return new Promise((resolve, reject) => {
-        resolve(allSubscribers);
-    });
-}
-
-const triggerPushMsg = function (subscription, dataToSend) {
-    console.log("TRIGGER PUSH MSG", subscription.subscription, dataToSend);
-    return webpush.sendNotification(subscription.subscription, dataToSend).catch((err) => {
-        if (err.statusCode === 410) {
-            console.log("ERROR", err.statusCode, "ID", subscription._id);
-            // return deleteSubscriptionFromDatabase(subscription._id);
-            return "Error";
-        } else {
-            console.log("ERROR STATUS CODE:", err.statusCode);
-            console.log("Subscription is no longer valid: ", err);
-        }
-    });
-};
 
 ///////////////////////////////
 ///// extra shit comments /////

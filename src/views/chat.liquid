@@ -10,9 +10,23 @@
     <form action="/addMessageWithRefresh" method="post" class="textForm">
       <input type="text" name="text" id="textInput" placeholder="Enter text">
       <input type="hidden" name="messageId" value="0" >
+      <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
       <input type="hidden" name="chatId" value="{{ chatId }}">
       <input type="hidden" name="userId" value="{{ currentUser.id }}">
       <button type="submit">Send Text</button>
+      {% comment %} <section>
+        <form action="/trigger-push-msg" method="post">
+          <label>Title 
+            <input type="text" name="title">
+          </label>
+          <label>Body 
+            <input type="text" name="body">
+          </label>
+            <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
+            <input type="hidden" name="userId" value="{{ user.id }}">
+          <button type="submit">Send</button>
+        </form>
+      </section> {% endcomment %}
     </form>
     <ul class="message-box">
       {% for chat in chats %}
