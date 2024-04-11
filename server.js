@@ -162,7 +162,7 @@ async function addFact(request, response, next) {
     const newFact = { text, userId, receiverId, from, chatId, messageId }; // Include receiverId in the newFact object
     facts.push(newFact);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
-    // TODO sendPushNoti(request.body, receiverId);
+    sendPushNoti(request.body, receiverId);
     return { newFact, redirect: `/account/${userId}/chat/${chatId}` };
 }
 

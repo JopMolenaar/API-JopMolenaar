@@ -22,10 +22,10 @@ function urlBase64ToUint8Array(base64String) {
     }
     return outputArray;
 }
-// TODO
-// askPermission();
-// getNotificationPermissionState();
-// subscribeUserToPush();
+// TODO make user friendly
+askPermission();
+getNotificationPermissionState();
+subscribeUserToPush();
 
 function askPermission() {
     return new Promise(function (resolve, reject) {
