@@ -320,13 +320,26 @@ function isValidSaveRequest(req, res) {
 function getSubscriptionsFromDatabase(id) {
     console.log("GET SUB");
     let subscribersToResolve = [];
+    let dontSendTwice = [];
     return new Promise((resolve, reject) => {
         // console.log("allSubscribers: ", allSubscribers);
         allSubscribers.forEach((sub) => {
-            console.log(sub.id, id);
+            // console.log(sub.id, id);
             if (sub.userId === id) {
-                subscribersToResolve.push(sub);
-                console.log("Send to: ", sub.userId);
+                console.log("SUB", sub);
+                if (dontSendTwice[0]) {
+                    dontSendTwice.forEach((subTwice) => {
+                        if (subTwice.id !== sub.id && subTwice.endpoint !== sub.endpoint) {
+                            subscribersToResolve.push(sub);
+                            console.log("Send to: ", sub.userId);
+                            dontSendTwice.push(sub);
+                        }
+                    });
+                } else {
+                    subscribersToResolve.push(sub);
+                    console.log("Send to: ", sub.userId);
+                    dontSendTwice.push(sub);
+                }
             }
         });
         resolve(subscribersToResolve);
@@ -373,14 +386,13 @@ function sendPushNoti(data, sendTo) {
         let promiseChain = Promise.resolve();
         let doubleDev = [];
         for (let i = 0; i < subscriptions.length; i++) {
-            if (!doubleDev.includes(subscriptions[i].subscription.endpoint)) {
-                // TODO if subscription.subscription.endpoint already exists in a array, don't send it.
-                const subscription = subscriptions[i];
-                doubleDev.push(subscriptions[i].subscription.endpoint);
-                promiseChain = promiseChain.then(() => {
-                    return triggerPushMsg(subscription, payload);
-                });
-            }
+            // if (!doubleDev.includes(subscriptions[i].subscription.endpoint)) {
+            const subscription = subscriptions[i];
+            doubleDev.push(subscriptions[i].subscription.endpoint);
+            promiseChain = promiseChain.then(() => {
+                return triggerPushMsg(subscription, payload);
+            });
+            // }
         }
 
         // return promiseChain;
