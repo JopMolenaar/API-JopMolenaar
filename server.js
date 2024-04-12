@@ -504,7 +504,36 @@ app.get("/account/:id", async (req, res) => {
             if (error) {
                 return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, error, notification }));
             }
-            return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, notification }));
+            let showNotification = true;
+            // const notification = await getNotificationStatus(clientId);
+            loadJSON(subsDB)
+                .then((data) => {
+                    if (data) {
+                        const foundData = data.find((u) => u.userId === clientId);
+                        if (foundData) {
+                            showNotification = false;
+                        }
+                    } else {
+                        console.log("File does not exist or is empty.");
+                    }
+                    console.log(showNotification);
+                    return res.send(renderTemplate("src/views/chat.liquid", { currentUser: currentUser, showNotification, chatOpen: false }));
+
+                    return res.send(
+                        renderTemplate("src/views/chat.liquid", {
+                            contact: currentContact,
+                            chats: allChats,
+                            currentUser,
+                            chatId,
+                            showNotification,
+                            chatOpen: true,
+                        })
+                    );
+                })
+                .catch((error) => {
+                    console.error("Error loading or saving JSON:", error);
+                });
+            // return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, notification }));
         } else {
             return res.send(renderTemplate("src/views/notFound.liquid"));
         }
@@ -522,7 +551,7 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
         facts.forEach((fact) => {
             if (fact.chatId === chatId) {
                 let direction;
-                if (fact.userId === currentUser) {
+                if (fact.userId === clientId) {
                     direction = "away";
                 } else {
                     direction = "incoming";
@@ -544,7 +573,9 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
                     console.log("File does not exist or is empty.");
                 }
                 console.log(showNotification);
-                return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats, currentUser, chatId, showNotification }));
+                return res.send(
+                    renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats, currentUser, chatId, showNotification, chatOpen: true })
+                );
             })
             .catch((error) => {
                 console.error("Error loading or saving JSON:", error);

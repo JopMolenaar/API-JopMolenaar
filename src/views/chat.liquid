@@ -2,42 +2,65 @@
 {% block head %}
   <link rel="stylesheet" href="/styles/message.css">
 {% endblock %}
-{% block contentHeader %}
+  {% comment %} {% block contentHeader %}
 <header>
-  <a href="../">Back</a>
+<a href="../">Back</a> 
   <p>{{ currentUser.name }}</p>
   <img src="" alt="profile photo">
 </header>
-{% endblock %}
+{% endblock %}{% endcomment %}
 {% block contentMain %}
 <main>
   {% if showNotification %}
     {% render '../components/noti.liquid' %}
   {% endif %}
   {% comment %} <h1>Send a message to {{ contact.name  }}</h1> {% endcomment %}
-  <div class="chat-box">
-    <form action="/addMessageWithRefresh" method="post" class="textForm">
-      <input type="text" name="text" id="textInput" placeholder="Enter text">
-      <input type="hidden" name="messageId" value="0" >
-      <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
-      <input type="hidden" name="chatId" value="{{ chatId }}">
-      <input type="hidden" name="userId" value="{{ currentUser.id }}">
-      <button type="submit">Send Text</button>
-    </form>
-    <section class="message-box">
-      <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
-      {% for chat in chats %}
-        <p class="{{ chat.direction }}">Message from {{ chat.fact.from }}: {{ chat.fact.text }}</p>
-      {% endfor %}
-    </section>
+  {% if chatOpen %}
+    <div class="chat-box">
+      <div><img src="" alt="profile picture"><h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2></div>
+      <section class="message-box">
+        <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
+        {% for chat in chats %}
+          <p class="{{ chat.direction }}">Message from {{ chat.fact.from }}: {{ chat.fact.text }}</p>
+        {% endfor %}
+      </section>
+      <form action="/addMessageWithRefresh" method="post" class="textForm">
+        <textarea placeholder="Enter text" id="textInput" name="text" cols="30" rows="10"></textarea>
+        <input type="hidden" name="messageId" value="0" >
+        <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
+        <input type="hidden" name="chatId" value="{{ chatId }}">
+        <input type="hidden" name="userId" value="{{ currentUser.id }}">
+        <button type="submit">Send Text</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="chat-box">
+        <h2 class="visually-hidden">You havent opened a chat yet.</h2>
+        <p>Open a chat</p>
+        <img src="" alt="">
+      </div>
+  {% endif %}
+<section class="sidebar">
+  <h2 class="visually-hidden">Sidebar with chats and account info</h2>
+  <div class="profile">
+    <p><span class="visually-hidden">Account from: </span>{{ currentUser.name }}</p>
+    <img src="" alt="">
+    <div class="profileMenu">
+      <a href="/login">Log out</a>
+      {% comment %} <a href="/settings/{{  currentUser.id }}"></a> {% endcomment %}
+    </div>
   </div>
+  {% comment %} // TODO click on profiel and a menu shows up with a logout button + seetings link to settings page? {% endcomment %}
   <ul class="chats">
-    {% for chat in user.chats %}
-      <li>Chat with: <a href="/account/{{ user.id }}/chat/{{ chat.id }}"> {{ chat.name }}</a></li>
+    {% for chat in currentUser.chats %}
+      <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}"><img src="" alt="pf"> {{ chat.name }}</a></li>
     {% endfor %} 
   </ul>
+</section>
+
 </main>
 <script src="/js/extraFunctions.js"></script>
 <script src="/js/addMessage.js"></script>
+<script src="/js/profilePopup.js"></script>
 <script src="/js/sw.js"></script>
 {% endblock %}
