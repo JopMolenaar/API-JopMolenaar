@@ -14,7 +14,7 @@
   {% if showNotification %}
     {% render '../components/noti.liquid' %}
   {% endif %}
-  <h1>Send a message to {{ contact.name  }}</h1>
+  {% comment %} <h1>Send a message to {{ contact.name  }}</h1> {% endcomment %}
   <div class="chat-box">
     <form action="/addMessageWithRefresh" method="post" class="textForm">
       <input type="text" name="text" id="textInput" placeholder="Enter text">
@@ -24,11 +24,12 @@
       <input type="hidden" name="userId" value="{{ currentUser.id }}">
       <button type="submit">Send Text</button>
     </form>
-    <ul class="message-box">
+    <section class="message-box">
+      <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
       {% for chat in chats %}
-        <li>Message from {{ chat.from }}: {{ chat.text }}</li>
+        <p class="{{ chat.direction }}">Message from {{ chat.fact.from }}: {{ chat.fact.text }}</p>
       {% endfor %}
-    </ul>
+    </section>
   </div>
   <ul class="chats">
     {% for chat in user.chats %}

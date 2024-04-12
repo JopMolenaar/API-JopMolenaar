@@ -10,7 +10,8 @@ const evtSource = new EventSource(`/events/${userId}`);
 evtSource.onmessage = (event) => {
     const message = JSON.parse(event.data);
     if (message.text !== undefined) {
-        const newElement = document.createElement("li");
+        const newElement = document.createElement("p");
+        newElement.classList.add("away");
         if (message.chatId === chatId) {
             newElement.textContent = `Message from ${message.from}: ${message.text}`;
             eventList.appendChild(newElement);

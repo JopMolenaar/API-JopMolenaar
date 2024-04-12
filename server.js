@@ -521,7 +521,14 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
         console.log("facts:", facts);
         facts.forEach((fact) => {
             if (fact.chatId === chatId) {
-                allChats.push(fact);
+                let direction;
+                if (fact.userId === currentUser) {
+                    direction = "away";
+                } else {
+                    direction = "incoming";
+                }
+                allChats.push({ fact, direction });
+                console.log(allChats);
             }
         });
         let showNotification = true;

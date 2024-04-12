@@ -2,10 +2,6 @@
 
 {% block contentMain %}
 <main>
-  {% if notification %}
-    {% render '../components/noti.liquid' %}
-  {% endif %}
-
   {% if error %}
     <p>{{ error }}</p>
   {% endif %}

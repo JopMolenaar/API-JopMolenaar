@@ -1,25 +1,78 @@
 body {
     background-color: var(--color-body);
-    min-height: 100vh;
+    /* min-height: 100vh; */
     display: flex;
     justify-content: space-between;
     flex-direction: column;
 }
-
+header{
+    height: 3em;
+    width: 100%;
+    border-bottom: solid black 1px;
+    display: flex;
+    flex-direction: row;
+}
+main {
+    display: flex;
+    display: grid;
+    grid-template-columns: 3em 1fr;
+    height: calc(100% - 3em);
+}
 .chat-box {
-    padding: 2em;
+    background-color: rgb(221, 221, 221);
     display: flex;
     flex-direction: column;
+    order: 2;
+    display: grid;
+    grid-template-rows: 1fr 10%;
 }
 .message-box {
+    padding: 2em;
     order: -1;
     margin-bottom: 2em;
-    background-color: white;
     border-radius: 10px;
     padding: 0.4rem;
-    /* height: 80vh; */
 }
-.message-box li {
-    list-style: none;
+.message-box {
+    display: flex;
+    flex-direction: column;
+    & p.away{
+        align-self: end;
+    }
+    & p.incoming{
+        align-self: start;
+    }
+}
+.textForm{
+    border: solid black 2px;
+    margin: 0;
+    display: flex;
+    & input {
+        width: 90%;
+        height: 100%;
+    }
+    & button {
+        width: 10%;
+    }
+}
+.notificationHeader {
+    width: 100%;
+    height: fit-content;
+    padding: 0.5em;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    background-color: yellow;
+    color: black;
+}
+.notificationHeader p {
+    margin: 0;
 }
 
+.chats {
+    background-color: #294643;
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
