@@ -1,7 +1,11 @@
 {% layout "src/views/layouts/base.liquid" %}
 
-{% block content %}
+{% block contentMain %}
 <main>
+  {% if notification %}
+    {% render '../components/noti.liquid' %}
+  {% endif %}
+
   {% if error %}
     <p>{{ error }}</p>
   {% endif %}
@@ -47,4 +51,5 @@
 </main>
 <script src="/js/extraFunctions.js"></script>
 <script src="/js/addContact.js"></script>
+<script src="/js/sw.js"></script>
 {% endblock %}

@@ -2,13 +2,18 @@
 {% block head %}
   <link rel="stylesheet" href="/styles/message.css">
 {% endblock %}
-{% block content %}
+{% block contentHeader %}
 <header>
   <a href="../">Back</a>
   <p>{{ currentUser.name }}</p>
   <img src="" alt="profile photo">
 </header>
+{% endblock %}
+{% block contentMain %}
 <main>
+  {% if showNotification %}
+    {% render '../components/noti.liquid' %}
+  {% endif %}
   <h1>Send a message to {{ contact.name  }}</h1>
   <div class="chat-box">
     <form action="/addMessageWithRefresh" method="post" class="textForm">
@@ -18,19 +23,6 @@
       <input type="hidden" name="chatId" value="{{ chatId }}">
       <input type="hidden" name="userId" value="{{ currentUser.id }}">
       <button type="submit">Send Text</button>
-      {% comment %} <section>
-        <form action="/trigger-push-msg" method="post">
-          <label>Title 
-            <input type="text" name="title">
-          </label>
-          <label>Body 
-            <input type="text" name="body">
-          </label>
-            <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
-            <input type="hidden" name="userId" value="{{ user.id }}">
-          <button type="submit">Send</button>
-        </form>
-      </section> {% endcomment %}
     </form>
     <ul class="message-box">
       {% for chat in chats %}
@@ -46,4 +38,5 @@
 </main>
 <script src="/js/extraFunctions.js"></script>
 <script src="/js/addMessage.js"></script>
+<script src="/js/sw.js"></script>
 {% endblock %}

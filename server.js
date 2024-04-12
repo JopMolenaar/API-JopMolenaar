@@ -9,6 +9,7 @@ const sirv = require("sirv");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const webpush = require("web-push");
+const fs = require("fs");
 
 const vapidKeys = {
     publicKey: "BNvTbER8XgCTGxnGOVRLnnCfHA5WdTfe51CEHtGBAVeJuDbtsGjojizJIe-hgDbNda_zevi3cv_mf9Z642JcqP8",
@@ -34,6 +35,15 @@ app.get("/showUsers", (request, response) => response.json({ users: users }));
 // TODO add password in data and make a session id?
 
 const PORT = process.env.PORT || 4000;
+
+///////////////////////////////
+/////// DATABASES (json) //////
+///////////////////////////////
+// const usersDB = "database/users.json";
+// const clientsDB = "database/clients.json";
+// const chatsDB = "database/chats.json";
+const subsDB = "database/subs.json";
+// const messagesDB = "database/messages.json";
 
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
@@ -102,10 +112,28 @@ let facts = [
         messageId: 0.891413494111438,
     },
 ];
-let allSubscribers = [];
+
 ///////////////////////////////
 ////////// Functions //////////
 ///////////////////////////////
+function loadJSON(filename) {
+    if (fs.existsSync(filename)) {
+        // Read file asynchronously and parse JSON data
+        return new Promise((resolve, reject) => {
+            fs.readFile(filename, (err, data) => {
+                const jsonData = JSON.parse(data);
+                resolve(jsonData); // Resolve with parsed JSON data
+            });
+        });
+    } else {
+        // File does not exist, return null or appropriate value
+        return Promise.resolve(null);
+    }
+}
+
+function saveJSON(filename, json) {
+    return fs.writeFileSync(filename, JSON.stringify(json));
+}
 
 function renderTemplate(template, data) {
     const templateData = {
@@ -322,37 +350,70 @@ function getSubscriptionsFromDatabase(id) {
     let subscribersToResolve = [];
     let dontSendTwice = [];
     return new Promise((resolve, reject) => {
-        // console.log("allSubscribers: ", allSubscribers);
-        allSubscribers.forEach((sub) => {
-            // console.log(sub.id, id);
-            if (sub.userId === id) {
-                console.log("SUB", sub);
-                if (dontSendTwice[0]) {
-                    dontSendTwice.forEach((subTwice) => {
-                        if (subTwice.id !== sub.id && subTwice.endpoint !== sub.endpoint) {
-                            subscribersToResolve.push(sub);
-                            console.log("Send to: ", sub.userId);
-                            dontSendTwice.push(sub);
+        loadJSON(subsDB)
+            .then((allSubscribers) => {
+                if (allSubscribers) {
+                    allSubscribers.forEach((sub) => {
+                        console.log(sub.userId, id);
+                        if (sub.userId === id) {
+                            console.log("SUB", sub);
+                            if (dontSendTwice[0]) {
+                                dontSendTwice.forEach((subTwice) => {
+                                    if (subTwice.id !== sub.id && subTwice.endpoint !== sub.endpoint) {
+                                        subscribersToResolve.push(sub);
+                                        console.log("Send to: ", sub.userId);
+                                        dontSendTwice.push(sub);
+                                    }
+                                });
+                            } else {
+                                subscribersToResolve.push(sub);
+                                console.log("Send to: ", sub.userId);
+                                dontSendTwice.push(sub);
+                            }
                         }
                     });
+                    resolve(subscribersToResolve);
                 } else {
-                    subscribersToResolve.push(sub);
-                    console.log("Send to: ", sub.userId);
-                    dontSendTwice.push(sub);
+                    console.log("File does not exist or is empty.");
                 }
-            }
-        });
-        resolve(subscribersToResolve);
+            })
+            .catch((error) => {
+                console.error("Error loading or saving JSON:", error);
+            });
     });
+}
+
+function deleteSubscriptionFromDatabase(id) {
+    loadJSON(subsDB)
+        .then((allSubscribers) => {
+            if (allSubscribers) {
+                allSubscribers.forEach((sub) => {
+                    if (sub.id === id) {
+                        const index = allSubscribers.indexOf(sub);
+                        if (index > -1) {
+                            // only splice array when item is found
+                            allSubscribers.splice(index, 1); // 2nd parameter means remove one item only
+                        }
+                        // Save updated JSON data to file
+                        saveJSON(subsDB, allSubscribers);
+                        console.log("JSON data saved successfully.");
+                    }
+                });
+            } else {
+                console.log("File does not exist or is empty.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error loading or saving JSON:", error);
+        });
 }
 
 function triggerPushMsg(subscription, dataToSend) {
     console.log("TRIGGER PUSH MSG", subscription.subscription, dataToSend);
     return webpush.sendNotification(subscription.subscription, dataToSend).catch((err) => {
         if (err.statusCode === 410) {
-            console.log("ERROR", err.statusCode, "ID", subscription._id);
-            // return deleteSubscriptionFromDatabase(subscription._id);
-            return "Error";
+            console.log("ERROR", err.statusCode, "ID", subscription.id);
+            return deleteSubscriptionFromDatabase(subscription.id);
         } else {
             console.log("ERROR STATUS CODE:", err.statusCode);
             console.log("Subscription is no longer valid: ", err);
@@ -363,14 +424,35 @@ function triggerPushMsg(subscription, dataToSend) {
 function saveSubscriptionToDatabase(subscription, userId) {
     console.log("SAVE SUB", userId);
     return new Promise((resolve, reject) => {
-        const id = generateUniqueId(allSubscribers);
-        const newSubscriber = {
-            subscription: subscription,
-            id: id,
-            userId: userId,
-        };
-        allSubscribers.push(newSubscriber);
-        resolve(id); // Resolve with the generated ID
+        loadJSON(subsDB)
+            .then((allSubscribers) => {
+                if (allSubscribers) {
+                    allSubscribers.forEach((sub) => {
+                        // console.log(sub.id, id);
+                        if (sub.userId === userId && subscription.endpoint === sub.subscription.endpoint) {
+                            console.log("THIS ACCOUNT IS ALREADY GETTING NOTIFICATIONS");
+                        } else {
+                            console.log("NOT ALREADY GETTING NOTIFICATIONS");
+                        }
+                    });
+                    const id = generateUniqueId(allSubscribers);
+                    const newSubscriber = {
+                        subscription: subscription,
+                        id: id,
+                        userId: userId,
+                    };
+                    allSubscribers.push(newSubscriber);
+                    // Save updated JSON data to file
+                    saveJSON(subsDB, allSubscribers);
+                    console.log("JSON data saved successfully.");
+                    resolve(id); // Resolve with the generated ID
+                } else {
+                    console.log("File does not exist or is empty.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error loading or saving JSON:", error);
+            });
     });
 }
 
@@ -420,11 +502,12 @@ app.get("/account/:id", async (req, res) => {
         return res.send(renderTemplate("src/views/notFound.liquid"));
     } else {
         currentUser = users.find((u) => u.id === clientId);
+        let notification;
         if (currentUser !== undefined) {
             if (error) {
-                return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, error }));
+                return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, error, notification }));
             }
-            return res.send(renderTemplate("src/views/account.liquid", { user: currentUser }));
+            return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, notification }));
         } else {
             return res.send(renderTemplate("src/views/notFound.liquid"));
         }
@@ -444,7 +527,24 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
                 allChats.push(fact);
             }
         });
-        return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats, currentUser, chatId }));
+        let showNotification = true;
+        // const notification = await getNotificationStatus(clientId);
+        loadJSON(subsDB)
+            .then((data) => {
+                if (data) {
+                    const foundData = data.find((u) => u.userId === clientId);
+                    if (foundData) {
+                        showNotification = false;
+                    }
+                } else {
+                    console.log("File does not exist or is empty.");
+                }
+                console.log(showNotification);
+                return res.send(renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats, currentUser, chatId, showNotification }));
+            })
+            .catch((error) => {
+                console.error("Error loading or saving JSON:", error);
+            });
     } else {
         return res.send(renderTemplate("src/views/notFound.liquid"));
     }
@@ -577,3 +677,66 @@ app.post("/save-subscription/:id", function (req, res) {
 // import { json, urlencoded } from "body-parser";
 // import { cors } from "@tinyhttp/cors";
 // issues with this when writing it with tinyhttp
+
+
+
+
+// loadJSON("db.json")
+//     .then((data) => {
+//         if (data) {
+//             // TODO Manipulate data (e.g., push a value to an array)
+//             const newData = {
+//                 name: "Jop",
+//                 id: 13287,
+//             };
+//             data.push(newData);
+//             // Save updated JSON data to file
+//             saveJSON("db.json", data);
+//             console.log("JSON data saved successfully.");
+//         } else {
+//             console.log("File does not exist or is empty.");
+//         }
+//     })
+//     .catch((error) => {
+//         console.error("Error loading or saving JSON:", error);
+//     });
+
+
+
+// function addUser(req, res) {
+//     const { name } = req.body;
+//     loadJSON(usersDB)
+//         .then((users) => {
+//             if (users) {
+//                 // Check if the user already exists
+//                 const existingUser = users.find((user) => user.name === name);
+//                 if (existingUser) {
+//                     return res.send(
+//                         renderTemplate("src/views/index.liquid", { page: "Sign-up", errorMessage: `User: ${name} already exists`, inputValue: name })
+//                     );
+//                 }
+
+//                 // Generate a unique ID for the new user
+//                 const id = generateUniqueId(users);
+//                 const newUser = {
+//                     id: id,
+//                     name: name,
+//                     chats: [],
+//                     contacts: [],
+//                 };
+
+//                 users.push(newUser);
+//                 console.log("All users:", users);
+//                 saveJSON(usersDB, users);
+//                 console.log("JSON data saved successfully.");
+//                 // Redirect to the account page of the new added user
+//                 return res.redirect(`/account/${id}`);
+//             } else {
+//                 console.log("File does not exist or is empty.");
+//                 renderTemplate("src/views/index.liquid", { page: "Sign-up", errorMessage: `There is an error` });
+//             }
+//         })
+//         .catch((error) => {
+//             console.error("Error loading or saving JSON:", error);
+//         });
+// }

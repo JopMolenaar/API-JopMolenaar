@@ -1,0 +1,36 @@
+[
+    {
+        "id": "65956570",
+        "name": "Mink",
+        "chats": [
+            {
+                "id": "3889220298",
+                "name": "Jop"
+            }
+        ],
+        "contacts": [
+            {
+                "id": "37157981",
+                "name": "Jop",
+                "existingChat": true
+            }
+        ]
+    },
+    {
+        "id": "37157981",
+        "name": "Jop",
+        "chats": [
+            {
+                "id": "3889220298",
+                "name": "Mink"
+            }
+        ],
+        "contacts": [
+            {
+                "id": "65956570",
+                "name": "Mink",
+                "existingChat": true
+            }
+        ]
+    }
+]

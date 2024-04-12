@@ -1,0 +1,18 @@
+[
+    {
+        "text": "Hoi Mink",
+        "userId": "37157981",
+        "receiverId": "65956570",
+        "from": "Jop",
+        "chatId": "3889220298",
+        "messageId": 0.148236156069004
+    },
+    {
+        "text": "Hoi Jop",
+        "userId": "65956570",
+        "receiverId": "37157981",
+        "from": "Mink",
+        "chatId": "3889220298",
+        "messageId": 0.891413494111438
+    }
+]

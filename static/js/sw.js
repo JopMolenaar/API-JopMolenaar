@@ -1,15 +1,14 @@
-// if ("serviceWorker" in navigator) {
-//     window.addEventListener("load", () => {
-//         navigator.serviceWorker.register("/serviceWorker.js").then(
-//             function (registration) {
-//                 console.log("ServiceWorker registration successful with scope: ", registration.scope);
-//             },
-//             function (err) {
-//                 console.log("ServiceWorker registration failed: ", err);
-//             }
-//         );
-//     });
-// }
+const notiYesButton = document.querySelector("#yesNoti");
+const notiHeader = document.querySelector(".notificationHeader");
+if (notiYesButton) {
+    notiYesButton.addEventListener("click", () => {
+        askPermission();
+        getNotificationPermissionState();
+        subscribeUserToPush();
+        notiHeader.style.display = "none";
+    });
+}
+
 function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding).replace(/\-/g, "+").replace(/_/g, "/");
@@ -22,10 +21,6 @@ function urlBase64ToUint8Array(base64String) {
     }
     return outputArray;
 }
-// TODO make user friendly
-askPermission();
-getNotificationPermissionState();
-subscribeUserToPush();
 
 function askPermission() {
     return new Promise(function (resolve, reject) {
@@ -39,6 +34,8 @@ function askPermission() {
     }).then(function (permissionResult) {
         if (permissionResult !== "granted") {
             throw new Error("We weren't granted permission.");
+        } else if (permissionResult === "granted") {
+            new Notification("You can now get notifications");
         }
     });
 }
@@ -56,7 +53,11 @@ function getNotificationPermissionState() {
 }
 
 function getSWRegistration() {
-    return navigator.serviceWorker.register("/serviceWorker.js");
+    if ("serviceWorker" in navigator) {
+        return navigator.serviceWorker.register("/serviceWorker.js");
+    } else {
+        return;
+    }
 }
 
 function subscribeUserToPush() {
@@ -70,9 +71,7 @@ function subscribeUserToPush() {
             return registration.pushManager.subscribe(subscribeOptions);
         })
         .then(function (pushSubscription) {
-            // console.log("Received PushSubscription: ", JSON.stringify(pushSubscription));
             const subscriptionObject = JSON.stringify(pushSubscription);
-            // console.log(subscriptionObject);
             sendSubscriptionToBackEnd(subscriptionObject);
             return subscriptionObject;
         });
@@ -81,9 +80,6 @@ function subscribeUserToPush() {
 function sendSubscriptionToBackEnd(subscription) {
     const userId = getIdFromUrl("account");
     console.log("account:", userId);
-    // subscription.userId = userId;
-    // console.log(subscription); // is really weird, // TODO find a way to link it with the userId
-    // console.log(subscription);
     return fetch(`/save-subscription/${userId}`, {
         method: "POST",
         headers: {
