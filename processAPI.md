@@ -12,3 +12,8 @@ Vrijdag had ik het feedback gesprek bent Declan. Hij zei dat ik erg goed op weg 
 Die zaterdag heb ik een hoop logica geschreven zoals het maken van accounts, contacten toevoegen, chats aanmaken etc. 
 
 ### Week 2
+
+Veel logica nog proberen te schrijven met het elke keer fetchen van je contacten en als er een contact extra is, die toevoegen aan je contacten lijst met js. Dit klonk makkelijk in mijn hooft maar had er een voor gezeten en het lukte niet helemaal perfect. Uiteindelijk heb ik deze functionaliteit uitgesteld. 
+
+Ik ben deze week bezig geweest met service workers, ik wilde het kunnen downloaden op mn mobiel en door een servcie worker, een manifest en een goegekeurde lighthouse check is het een pwa. Nu kon ik het downloaden op mn mobiel. Dit was veel makkelijker dan gedacht.
+Ook ben ik bezig geweest met push notifications, ik had het artikel gelezen dat declan mij had gestuurd en het zag er best overzichtelijk en te bergijpen uit. Ik probeerde dit toe te passen op mn website en kreeg een aantal errors, na wat trial and error, kijken op de github van de demo, en het lezen van het artikel kon ik push notifactions sturen. Dit ging dan wel naar iedereen die een account had op mijn website dat is natuurlijk niet de bedoeling. Ik schreef wat logica en het lukte mij om alleen de receiver van de message de popup te krijgen laten zien. Voor localhost werkt dit op chrome naar chrome, mobiel naar firefox, en chrome naar firefox. De rest van de opties laat het niks zien. Terwijl al mijn settings voor de browsers en system settings goed staan.  

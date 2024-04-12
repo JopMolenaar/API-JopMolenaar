@@ -321,11 +321,12 @@ function getSubscriptionsFromDatabase(id) {
     console.log("GET SUB");
     let subscribersToResolve = [];
     return new Promise((resolve, reject) => {
-        console.log("allSubscribers: ", allSubscribers);
+        // console.log("allSubscribers: ", allSubscribers);
         allSubscribers.forEach((sub) => {
             console.log(sub.id, id);
             if (sub.userId === id) {
                 subscribersToResolve.push(sub);
+                console.log("Send to: ", sub.userId);
             }
         });
         resolve(subscribersToResolve);
@@ -363,7 +364,8 @@ function saveSubscriptionToDatabase(subscription, userId) {
 function sendPushNoti(data, sendTo) {
     // const { title, body, icon, userId } = data;
     const { text, userId, icon } = data;
-    const dataToSend = { title: "Message from someone", body: text, icon };
+    const currentUser = users.find((u) => u.id === userId);
+    const dataToSend = { title: `Message from ${currentUser.name}`, body: text, icon };
     const payload = JSON.stringify(dataToSend);
     // TODO = logic to send it to the right person if that person is not online
     return getSubscriptionsFromDatabase(sendTo).then(function (subscriptions) {
