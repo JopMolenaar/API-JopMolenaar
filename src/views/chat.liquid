@@ -1,10 +1,14 @@
 {% layout "src/views/layouts/base.liquid" %}
-
+{% block head %}
+  <link rel="stylesheet" href="/styles/message.css">
+{% endblock %}
 {% block content %}
+<header>
+  <a href="../">Back</a>
+  <p>{{ currentUser.name }}</p>
+  <img src="" alt="profile photo">
+</header>
 <main>
-  <div>
-    <a href="../">Back</a>
-  </div>
   <h1>Send a message to {{ contact.name  }}</h1>
   <div class="chat-box">
     <form action="/addMessageWithRefresh" method="post" class="textForm">
@@ -34,6 +38,11 @@
       {% endfor %}
     </ul>
   </div>
+  <ul class="chats">
+    {% for chat in user.chats %}
+      <li>Chat with: <a href="/account/{{ user.id }}/chat/{{ chat.id }}"> {{ chat.name }}</a></li>
+    {% endfor %} 
+  </ul>
 </main>
 <script src="/js/extraFunctions.js"></script>
 <script src="/js/addMessage.js"></script>

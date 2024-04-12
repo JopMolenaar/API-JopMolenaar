@@ -1,3 +1,11 @@
+body {
+    background-color: var(--color-body);
+    min-height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
 .chat-box {
     padding: 2em;
     display: flex;
@@ -9,7 +17,9 @@
     background-color: white;
     border-radius: 10px;
     padding: 0.4rem;
+    /* height: 80vh; */
 }
 .message-box li {
     list-style: none;
 }
+

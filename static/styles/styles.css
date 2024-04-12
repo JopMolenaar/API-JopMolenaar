@@ -62,8 +62,21 @@ p, li {
         --color-code: white;
     }
 } */
-
+/* 
 body {
     background-color: var(--color-body);
-}
+    min-height: 100vh;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+} */
 
+footer {
+    background-color: #294643;
+    color: white;
+    padding: 1em;
+    height: fit-content;
+}
+footer p {
+    margin: 0;
+}
