@@ -23,14 +23,10 @@ const engine = new Liquid({
 });
 
 const app = express();
-
 app.use(sirv("static"));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
-app.get("/status", (request, response) => response.json({ users: users, facts: facts, allSubscribers: allSubscribers }));
-app.get("/showUsers", (request, response) => response.json({ users: users }));
 
 // TODO add password in data and make a session id?
 
@@ -48,6 +44,7 @@ const subsDB = "database/subs.json";
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
 });
+
 
 ///////////////////////////////
 ///////// Stored data /////////
@@ -569,6 +566,19 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
         return res.status(400).send("User doesn't exists");
     }
 });
+
+app.get("/status", (request, response) => {
+    loadJSON(subsDB)
+        .then((data) => {
+            response.json({ users: users, facts: facts, allSubscribers: data });
+            // Proceed with data processing or other operations
+        })
+        .catch((error) => {
+            console.error("Error loading JSON:", error);
+        });
+}); 
+
+app.get("/showUsers", (request, response) => response.json({ users: users }));
 
 ///////////////////////////////
 ////////// app.post ///////////
