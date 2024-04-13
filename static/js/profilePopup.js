@@ -1,6 +1,6 @@
 const profile = document.querySelector(".profile");
 const menu = document.querySelector(".profileMenu");
-menu.classList.add("hide");
+menu.style.display = "none";
 profile.addEventListener("click", () => {
     if (menu.style.display === "none") {
         menu.style.display = "block";

@@ -14,7 +14,8 @@
                 "name": "Jop",
                 "existingChat": true
             }
-        ]
+        ],
+        "pfPicture": "/icons/black.jpeg"
     },
     {
         "id": "37157981",
@@ -31,6 +32,7 @@
                 "name": "Mink",
                 "existingChat": true
             }
-        ]
+        ],
+        "pfPicture": "/icons/black.jpeg"
     }
 ]

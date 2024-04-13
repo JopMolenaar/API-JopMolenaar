@@ -17,7 +17,7 @@
   {% comment %} <h1>Send a message to {{ contact.name  }}</h1> {% endcomment %}
   {% if chatOpen %}
     <div class="chat-box">
-      <div><img src="" alt="profile picture"><h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2></div>
+      <div><img src="{{ contact.pfPicture }}" alt="profile picture"><h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2></div>
       <section class="message-box">
         <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
         {% for chat in chats %}
@@ -30,7 +30,7 @@
         <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
         <input type="hidden" name="chatId" value="{{ chatId }}">
         <input type="hidden" name="userId" value="{{ currentUser.id }}">
-        <button type="submit">Send Text</button>
+        <button type="submit"><span class="visually-hidden">Send Text</span><img src="/icons/send.svg" alt=""> </button>
       </form>
     </div>
     {% else %}
@@ -43,8 +43,9 @@
 <section class="sidebar">
   <h2 class="visually-hidden">Sidebar with chats and account info</h2>
   <div class="profile">
+    <div>
     <p><span class="visually-hidden">Account from: </span>{{ currentUser.name }}</p>
-    <img src="" alt="">
+    <img src="{{ currentUser.pfPicture }}" alt=""></div>
     <div class="profileMenu">
       <a href="/login">Log out</a>
       {% comment %} <a href="/settings/{{  currentUser.id }}"></a> {% endcomment %}

@@ -72,6 +72,7 @@ let users = [
                 existingChat: true,
             },
         ],
+        pfPicture: "/icons/black.jpeg",
     },
     {
         id: "37157981",
@@ -89,6 +90,7 @@ let users = [
                 existingChat: true,
             },
         ],
+        pfPicture: "/icons/black.jpeg",
     },
 ];
 let facts = [
@@ -235,6 +237,7 @@ function addUser(req, res) {
         name: name,
         chats: [],
         contacts: [],
+        pfPicture: "/icons/black.jpeg",
     };
 
     users.push(newUser);

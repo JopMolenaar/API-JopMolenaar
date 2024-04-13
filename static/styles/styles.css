@@ -49,6 +49,7 @@ p, li {
 
 :root {
     --color-body: rgb(180, 180, 180);
+    --theme-color: #294643; 
 }
 
 /* @media (prefers-color-scheme: dark) {
@@ -72,7 +73,7 @@ body {
 } */
 
 footer {
-    background-color: #294643;
+    background-color: var(--theme-color);
     color: white;
     padding: 1em;
     height: fit-content;
