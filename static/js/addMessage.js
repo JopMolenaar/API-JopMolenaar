@@ -11,12 +11,14 @@ evtSource.onmessage = (event) => {
     const message = JSON.parse(event.data);
     if (message.text !== undefined) {
         const newElement = document.createElement("p");
-        newElement.classList.add("away");
+        if (message.userId === userId) {
+            newElement.classList.add("away");
+        } else {
+            newElement.classList.add("incoming");
+        }
         if (message.chatId === chatId) {
             newElement.textContent = `Message from ${message.from}: ${message.text}`;
             eventList.appendChild(newElement);
-        } else {
-            // TODO make push noti
         }
         // Retrieve messages for the current chat from local storage
         let allMessages = JSON.parse(localStorage.getItem(chatId)) || [];
