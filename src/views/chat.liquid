@@ -4,11 +4,11 @@
   <link rel="stylesheet" href="/styles/emptyChat.css">
 {% endblock %}
 {% block contentHeader %}
-<header>
-  {% if showNotification %}
-    {% render '../components/noti.liquid' %}
-  {% endif %}
-</header>
+{% if showNotification %}
+  <header>
+      {% render '../components/noti.liquid' %}
+  </header>
+{% endif %}
 {% endblock %}
 {% block contentMain %}
 <main>
