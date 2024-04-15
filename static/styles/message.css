@@ -51,7 +51,7 @@ main {
     padding: 2em;
     border-radius: 10px;
     padding: 0.4rem;
-    overflow-y: scroll;
+    overflow-y: auto;
     scroll-behavior: smooth;
 }
 .message-box {
@@ -76,19 +76,22 @@ main {
     bottom: 0;
     margin: 0;
     display: flex;
+    justify-content: center;
+    gap: 2em;
     width: 100%;
     height: 100%;
     grid-row: 3/4;
-    padding-bottom: 2em;
+    /* padding-bottom: 1em; */
     background-color:  var(--theme-color);
+    padding: 0em 2em 0em 0em;
     & textarea {
-        width: 90%;
+        width: 70%;
         height: 4em;
         font-size: 1em;
-        padding: 1rem;
+        padding: 1em;
         border-radius: 50px;
         resize: none;
-        margin-top: 0.4em;
+        margin-top: 0.6em;
     }
     & button {
         width: 10%;
@@ -128,13 +131,20 @@ main {
 }
 .open {
     transform: translateX(0%);
+    & .profile {
+        & button:nth-of-type(2){
+            & img {
+                rotate: 180deg;
+            }
+        }
+    }
 }
 
 .profile {
     position: relative;
     display: flex;
     justify-content: space-between;
-    height: 7%;
+    height: 8vh;
     padding: 0.5em;
     align-items: center;
     > button {
@@ -212,6 +222,8 @@ main {
 .chats {
     margin: 0;
     padding: 0.2rem;
+    height: calc(98% - 8vh);
+    overflow-y: auto;
 }
 .chats li{
     list-style: none;
