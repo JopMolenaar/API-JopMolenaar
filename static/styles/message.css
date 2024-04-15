@@ -52,6 +52,7 @@ main {
     border-radius: 10px;
     padding: 0.4rem;
     overflow-y: scroll;
+    scroll-behavior: smooth;
 }
 .message-box {
     background-color: white;

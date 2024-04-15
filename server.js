@@ -182,6 +182,7 @@ function eventsHandler(request, response, userId) {
 
 async function addFact(request, response, next) {
     const { text, userId, chatId, messageId } = request.body;
+    console.log(text, userId, chatId, messageId);
     const senderName = users.find((u) => u.id === userId);
     const from = senderName.name;
     const currentReceiver = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== userId));
@@ -507,35 +508,24 @@ app.get("/account/:id", async (req, res) => {
             if (error) {
                 return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, error, notification }));
             }
-            let showNotification = true;
+            let showNotification = false;
             // const notification = await getNotificationStatus(clientId);
-            loadJSON(subsDB)
-                .then((data) => {
-                    if (data) {
-                        const foundData = data.find((u) => u.userId === clientId);
-                        if (foundData) {
-                            showNotification = false;
-                        }
-                    } else {
-                        console.log("File does not exist or is empty.");
-                    }
-                    console.log(showNotification);
-                    return res.send(renderTemplate("src/views/chat.liquid", { currentUser: currentUser, showNotification, chatOpen: false }));
-
-                    return res.send(
-                        renderTemplate("src/views/chat.liquid", {
-                            contact: currentContact,
-                            chats: allChats,
-                            currentUser,
-                            chatId,
-                            showNotification,
-                            chatOpen: true,
-                        })
-                    );
-                })
-                .catch((error) => {
-                    console.error("Error loading or saving JSON:", error);
-                });
+            // loadJSON(subsDB)
+            //     .then((data) => {
+            //         if (data) {
+            //             const foundData = data.find((u) => u.userId === clientId);
+            //             if (foundData) {
+            //                 showNotification = false;
+            //             }
+            //         } else {
+            //             console.log("File does not exist or is empty.");
+            //         }
+            // console.log(showNotification);
+            return res.send(renderTemplate("src/views/chat.liquid", { currentUser: currentUser, showNotification, chatOpen: false }));
+            // })
+            // .catch((error) => {
+            //     console.error("Error loading or saving JSON:", error);
+            // });
             // return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, notification }));
         } else {
             return res.send(renderTemplate("src/views/notFound.liquid"));
