@@ -1,7 +1,7 @@
 const contactForm = document.querySelector("#addContact");
 contactForm.removeAttribute("action", "");
 contactForm.removeAttribute("method", "");
-const contactList = document.querySelector(".contacts");
+const contactList = document.querySelector(".chats");
 
 contactForm.addEventListener("submit", async (event) => {
     event.preventDefault();

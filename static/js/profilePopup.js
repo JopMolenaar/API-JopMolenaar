@@ -1,4 +1,5 @@
-const profile = document.querySelector(".profile");
+const profile = document.querySelector(".profile >  button:first-of-type");
+const profileCloseButton = document.querySelector(".profileMenu >  button");
 const menu = document.querySelector(".profileMenu");
 menu.style.display = "none";
 profile.addEventListener("click", () => {
@@ -8,9 +9,16 @@ profile.addEventListener("click", () => {
         menu.style.display = "none";
     }
 });
-profile.addEventListener("mouseover", () => {
-    menu.style.display = "block";
+profileCloseButton.addEventListener("click", () => {
+    if (menu.style.display === "none") {
+        menu.style.display = "block";
+    } else {
+        menu.style.display = "none";
+    }
 });
-profile.addEventListener("mouseout", () => {
-    menu.style.display = "none";
+
+const openSideBar = document.querySelector(".profile > button:last-of-type");
+const sidebar = document.querySelector(".sidebar");
+openSideBar.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
 });

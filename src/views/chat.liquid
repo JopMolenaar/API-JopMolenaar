@@ -2,18 +2,15 @@
 {% block head %}
   <link rel="stylesheet" href="/styles/message.css">
 {% endblock %}
-  {% comment %} {% block contentHeader %}
+{% block contentHeader %}
 <header>
-<a href="../">Back</a> 
-  <p>{{ currentUser.name }}</p>
-  <img src="" alt="profile photo">
-</header>
-{% endblock %}{% endcomment %}
-{% block contentMain %}
-<main>
   {% if showNotification %}
     {% render '../components/noti.liquid' %}
   {% endif %}
+</header>
+{% endblock %}
+{% block contentMain %}
+<main>
   {% comment %} <h1>Send a message to {{ contact.name  }}</h1> {% endcomment %}
   {% if chatOpen %}
     <div class="chat-box">
@@ -42,23 +39,28 @@
   {% endif %}
 <section class="sidebar">
   <h2 class="visually-hidden">Sidebar with chats and account info</h2>
-  <div class="profile">
+  <section class="profile">
+    <h3 class="visually-hidden">Account info</h3>
+    <button><img src="/images/settings.png" alt="settings symbol"></button>
     <div>
-    <p><span class="visually-hidden">Account from: </span>{{ currentUser.name }}</p>
-    <img src="{{ currentUser.pfPicture }}" alt=""></div>
-    <div class="profileMenu">
-      <a href="/login">Log out</a>
-      <button>Add contact</button>
-      <form action="/addContact" id="addContact" method="post">
-        <label>Name:
-          <input type="text" name="name">
-        </label>
-        <input type="hidden" name="userId" value="{{ user.id }}">
-        <button type="submit">Add contact</button>
-     </form>
-      {% comment %} <a href="/settings/{{  currentUser.id }}"></a> {% endcomment %}
-    </div>
-  </div>
+      <p><span class="visually-hidden">Account from: </span>{{ currentUser.name }}</p>
+      <img src="{{ currentUser.pfPicture }}" alt="Profile picture of {{ currentUser.name }}"></div>
+      <button>      <img src="/images/openMenu.png" aria-label="" alt=""></button>
+
+
+      <div class="profileMenu">
+        <button><img src="/images/settings.png" alt="settings symbol"></button>
+        <a href="/login">Log out</a>
+        <form action="/addContact" id="addContact" method="post">
+          <label>Name:
+            <input type="text" name="name">
+          </label>
+          <input type="hidden" name="userId" value="{{ user.id }}">
+          <button type="submit">Add contact</button>
+       </form>
+        {% comment %} <a href="/settings/{{  currentUser.id }}"></a> {% endcomment %}
+      </div>
+  </section>
   {% comment %} // TODO click on profiel and a menu shows up with a logout button + seetings link to settings page? {% endcomment %}
   <ul class="chats">
     {% for chat in currentUser.chats %}
