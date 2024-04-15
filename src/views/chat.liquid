@@ -1,6 +1,7 @@
 {% layout "src/views/layouts/base.liquid" %}
 {% block head %}
   <link rel="stylesheet" href="/styles/message.css">
+  <link rel="stylesheet" href="/styles/emptyChat.css">
 {% endblock %}
 {% block contentHeader %}
 <header>
@@ -31,7 +32,7 @@
       </form>
     </div>
     {% else %}
-    <div class="chat-box">
+    <div class="chat-box empty">
         <h2 class="visually-hidden">You havent opened a chat yet.</h2>
         <p>Open a chat</p>
         <img src="" alt="">
@@ -49,7 +50,7 @@
 
 
       <div class="profileMenu">
-        <button><img src="/images/settings.png" alt="settings symbol"></button>
+        <button><img src="/images/close.png" alt="settings symbol"></button>
         <a href="/login">Log out</a>
         <form action="/addContact" id="addContact" method="post">
           <label>Name:
@@ -64,7 +65,7 @@
   {% comment %} // TODO click on profiel and a menu shows up with a logout button + seetings link to settings page? {% endcomment %}
   <ul class="chats">
     {% for chat in currentUser.chats %}
-      <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}"><img src="" alt="pf"> {{ chat.name }}</a></li>
+      <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}"><img src="{{ currentUser.pfPicture }}" alt="pf"> {{ chat.name }}</a></li>
     {% endfor %} 
   </ul>
 </section>

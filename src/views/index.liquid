@@ -1,5 +1,7 @@
 {% layout "src/views/layouts/base.liquid" %}
-
+{% block head %}
+  <link rel="stylesheet" href="/styles/login.css">
+{% endblock %}
 {% block contentMain %}
 <main>
   {% if errorMessage %}
@@ -26,7 +28,7 @@
 {% if page == "Sign-up" %}
   <a href="/login">I already have an account.</a>
 {% else if page == "Log-in"  %}
-  <a href="/signup">I dont have a account yet.</a>
+  <a href="/signup">I don't have a account yet.</a>
 {% endif %}
 </main>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>

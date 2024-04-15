@@ -4,14 +4,14 @@ const menu = document.querySelector(".profileMenu");
 menu.style.display = "none";
 profile.addEventListener("click", () => {
     if (menu.style.display === "none") {
-        menu.style.display = "block";
+        menu.style.display = "grid";
     } else {
         menu.style.display = "none";
     }
 });
 profileCloseButton.addEventListener("click", () => {
     if (menu.style.display === "none") {
-        menu.style.display = "block";
+        menu.style.display = "grid";
     } else {
         menu.style.display = "none";
     }
