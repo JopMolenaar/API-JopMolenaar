@@ -21,6 +21,7 @@ main {
     grid-template-columns: 3em 1fr;
     overflow: hidden;
     height: 100%;
+    transition: 400ms;
 }
 .chat-box {
     background-color: rgb(221, 221, 221);
@@ -238,3 +239,16 @@ main {
     }
 }
 
+@media (min-width: 60em){
+    main {
+        grid-template-columns: 20em 1fr;
+    }
+    .sidebar{
+        position: static;
+        transform: translateX(0%);
+    }
+    .profile > button:nth-child(4) {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
