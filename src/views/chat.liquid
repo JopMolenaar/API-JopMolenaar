@@ -48,6 +48,14 @@
     <img src="{{ currentUser.pfPicture }}" alt=""></div>
     <div class="profileMenu">
       <a href="/login">Log out</a>
+      <button>Add contact</button>
+      <form action="/addContact" id="addContact" method="post">
+        <label>Name:
+          <input type="text" name="name">
+        </label>
+        <input type="hidden" name="userId" value="{{ user.id }}">
+        <button type="submit">Add contact</button>
+     </form>
       {% comment %} <a href="/settings/{{  currentUser.id }}"></a> {% endcomment %}
     </div>
   </div>
@@ -62,6 +70,7 @@
 </main>
 <script src="/js/extraFunctions.js"></script>
 <script src="/js/addMessage.js"></script>
+<script src="/js/addContact.js"></script>
 <script src="/js/profilePopup.js"></script>
 <script src="/js/sw.js"></script>
 {% endblock %}

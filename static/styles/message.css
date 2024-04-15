@@ -29,7 +29,7 @@ main {
     order: 2;
     display: grid;
     height: 100%;
-    grid-template-rows: 5% 1fr 10%;
+    grid-template-rows: 8vh 82vh 10vh;
 }
 .chat-box div {
     background-color: var(--theme-color);
@@ -42,6 +42,9 @@ main {
     & img {
         border-radius: 50%;
     }
+    h2 {
+        font-size: 2em;
+    }
 }
 .message-box {
     padding: 2em;
@@ -50,6 +53,8 @@ main {
     overflow-y: scroll;
 }
 .message-box {
+    background-color: white;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
     & p.away{
@@ -62,31 +67,34 @@ main {
         padding: 0.5rem;
         background-color: #2946433e;
         border-radius: 10px;
+        font-size: clamp(1em, 2vh, 2rem); 
     }
 }
 .textForm{
-    position: absolute;
     bottom: 0;
     margin: 0;
     display: flex;
-    width: 80%;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    grid-row: 3/4;
     padding-bottom: 2em;
-    padding-top: 0.5em;
     background-color:  var(--theme-color);
     & textarea {
         width: 90%;
-        height: 3.2em;
-        font-size: 1.3em;
+        height: 70%;
+        font-size: 2vh;
         padding: 1rem;
         border-radius: 50px;
         resize: none;
     }
     & button {
         width: 10%;
-        border-radius: 50%;
-        border: solid white 1px;
+        border:none;
         background-color:  var(--theme-color);
         padding: 0.5rem;
+        height: 70%;
+        min-width: 4em;
         & img {
             width: 100%;
             height: 100%;
@@ -118,7 +126,7 @@ main {
 .profile {
     display: grid;
     place-items: center;
-    height: 5%;
+    height: 7%;
     & div:nth-child(1){
         display: flex;
         gap: 0.3em;

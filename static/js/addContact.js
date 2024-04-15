@@ -1,4 +1,3 @@
-const userId = getIdFromUrl("account");
 const contactForm = document.querySelector("#addContact");
 contactForm.removeAttribute("action", "");
 contactForm.removeAttribute("method", "");
