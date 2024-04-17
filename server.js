@@ -72,7 +72,7 @@ let users = [
                 existingChat: true,
             },
         ],
-        pfPicture: "/icons/black.jpeg",
+        // pfPicture: "/icons/black.jpeg",
     },
     {
         id: "37157981",
@@ -90,7 +90,7 @@ let users = [
                 existingChat: true,
             },
         ],
-        pfPicture: "/icons/black.jpeg",
+        // pfPicture: "/icons/black.jpeg",
     },
 ];
 let facts = [

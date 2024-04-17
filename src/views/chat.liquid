@@ -15,15 +15,21 @@
   {% comment %} <h1>Send a message to {{ contact.name  }}</h1> {% endcomment %}
   {% if chatOpen %}
     <div class="chat-box">
-      <div><img src="{{ contact.pfPicture }}" alt="profile picture"><h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2></div>
+      <div>
+        {% if contact.pfPicture %}
+          <img src="{{ contact.pfPicture }}" alt="profile picture">
+          {% else %}
+          <img src="/images/profileDefault.png" alt="profile picture">
+        {% endif %}
+        <h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2></div>
       <section class="message-box">
         <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
         {% for chat in chats %}
-          <p class="{{ chat.direction }}">Message from {{ chat.fact.from }}: {{ chat.fact.text }}</p>
+          <p class="{{ chat.direction }}">{{ chat.fact.text }}</p>
         {% endfor %}
       </section>
       <form action="/addMessageWithRefresh" method="post" class="textForm">
-        <textarea placeholder="Enter text" id="textInput" name="text" cols="30" rows="10"></textarea>
+        <textarea placeholder="Enter text" id="textInput" name="text" cols="30" rows="10" required></textarea>
         <input type="hidden" name="messageId" value="0" >
         <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
         <input type="hidden" name="chatId" value="{{ chatId }}">
@@ -44,14 +50,20 @@
     <h3 class="visually-hidden">Account info</h3>
     <button><img src="/images/settings.png" alt="settings symbol"></button>
     <div>
-      <p><span class="visually-hidden">Account from: </span>{{ currentUser.name }}</p>
-      <img src="{{ currentUser.pfPicture }}" alt="Profile picture of {{ currentUser.name }}"></div>
-      <button>      <img src="/images/openMenu.png" aria-label="" alt=""></button>
+      <p class="visually-hidden"><span class="visually-hidden">Account from: </span>{{ currentUser.name }}</p>
+      {% if currentUser.pfPicture %}
+        <img src="{{ currentUser.pfPicture }}" alt="Profile picture of {{ currentUser.name }}">
+        {% else %}
+        <img src="/images/profileDefault.png" alt="Profile picture of {{ currentUser.name }}">
+      {% endif %}
+      </div>
+      <button><img src="/images/openMenu.png" aria-label="" alt=""></button>
 
 
       <div class="profileMenu">
         <button><img src="/images/close.png" alt="settings symbol"></button>
         <a href="/login">Log out</a>
+        <h4>Add new contact:</h4>
         <form action="/addContact" id="addContact" method="post">
           <label>Name:
             <input type="text" name="name">
@@ -65,7 +77,15 @@
   {% comment %} // TODO click on profiel and a menu shows up with a logout button + seetings link to settings page? {% endcomment %}
   <ul class="chats">
     {% for chat in currentUser.chats %}
-      <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}"><img src="{{ currentUser.pfPicture }}" alt="pf"> {{ chat.name }}</a></li>
+      <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}">
+     {% if currentUser.pfPicture %}
+      <img src="{{ currentUser.pfPicture }}" alt="pf">
+      {% else %}
+      <img src="/images/profileDefault.png" alt="pf">
+     {% endif %}
+
+      
+      {{ chat.name }}</a></li>
     {% endfor %} 
   </ul>
 </section>
