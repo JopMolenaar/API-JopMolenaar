@@ -20,3 +20,12 @@ Ook ben ik bezig geweest met push notifications, ik had het artikel gelezen dat 
 
 Feedback:
 Styling (mag best styling van een bestaande app), animaties (zijn een leuke toevoeging), naar declan voor de push noti's, denk aan ux (contact toevoegen maakt ook meteen een chat aan (net als snapchat)), voor een bundler kijk naar bun of een andere. 
+
+### Week 3
+Deze week ben ik druk bezig geweest met het beetje stylen van de webpagina, ik vindt het nog steeds erg moeilijk om zomaar even css te schrijven zonder er een design naast mij ligt en ik ben ook niet zo van het eerst desginen van mijn website. Ik ondervond problemen met de styling op mobiel, dit leek erg te verschillen met wat ik op mijn macbook had gemaakt. Dit kwam uiteindelijk doordat deze regel miste in de head van mijn pagina: `<meta name="viewport" content="width=device-width, initial-scale=1.0">`. 
+
+Na een beetje styling te hebben toegevoegd, notifications werkend te hebben gekregen, had ik nog een aantal dingen op mijn lijstje die ik nog graag wilde doen. Dat waren:
+- Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beelt moet blijven staan.
+- offline beschikbaar
+- 
+<!-- Add contact button styling -->
