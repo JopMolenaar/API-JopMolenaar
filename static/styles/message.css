@@ -3,6 +3,7 @@ body {
     display: flex;
     justify-content: space-between;
     flex-direction: column;
+    height: 100svh;
 }
 img {
     width: 30px;
@@ -31,15 +32,22 @@ main {
     display: grid;
     height: 100%;
     grid-template-rows: 4em 1fr 4em;
+    /* position: relative; */
 }
-.chat-box div {
+.chat-box > div {
     background-color: var(--theme-color);
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    padding: 0.5rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    top: 0;
+    /* position: absolute; */
+    width: 100%;
+    /* padding-left: 3.5em; */
+    /* width: auto; */
     & img {
         border-radius: 50%;
     }
@@ -55,6 +63,7 @@ main {
     max-height: 100%;
     display: flex;
     flex-direction: column;
+    grid-row: 2 / 3;
     & > div {
         background: none;
         display: flex;
@@ -87,11 +96,11 @@ main {
     margin: 0;
     display: flex;
     justify-content: center;
-    gap: 2em;
+    gap: 0.6em;
     grid-row: 3/4;
     background-color:  var(--theme-color);
-    padding: 0em 2em 0em 0em;
-    padding-left: 3em;
+    padding: 0em 0em 1em 1em;
+    padding: 0em 0em 1em 4em;
     & textarea {
         width: 70%;
         height: 3em;
@@ -142,6 +151,7 @@ main {
 }
 
 .sidebar {
+    z-index: 99;
     background-color: var(--theme-color);
     padding: 0;
     margin: 0;
@@ -227,6 +237,16 @@ main {
         justify-content: start;
         align-items: center;
     } 
+    & > button:hover {
+        & img {
+            scale: 1.1;
+        }
+    }
+    & > button:active {
+        & img {
+            scale: 0.9;
+        }
+    }
     & img {
         width: 30px;
         height: 30px;
@@ -256,6 +276,22 @@ main {
         & label {
             display: flex;
             justify-content: space-between;
+        }
+        & button {
+            all: unset;
+            border: solid black 2px;
+            padding: 0.3em;
+            background-color: gray;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            transition: 200ms;
+        }
+        & button:hover {
+            background-color: rgb(175, 175, 175);
+        }
+        & button:active {
+           scale: 0.9;
         }
     }
 }
