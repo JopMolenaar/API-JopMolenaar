@@ -210,8 +210,10 @@ main {
     right: 0;
     height: fit-content;
     background-color: rgb(166, 166, 166);
-    padding: 1em;
-    padding-top: 1em;
+    padding: 0.5em;
+    padding-top: 0.5em;
+    margin: 0.5em;
+    border-radius: 10px;
     & > button {
         all: unset;
         display: flex;
@@ -229,6 +231,7 @@ main {
         grid-row: 3/4;
         grid-column: 1/3;
         margin-bottom: 1em;
+        color: black;
     }
     & h4{
         grid-row: 4/5;

@@ -62,6 +62,11 @@ if (!empty) {
             console.log("Text sent successfully");
         } else {
             console.error("Failed to send text");
+            const errorSection = `  <section class="errorSection">
+                                        <h2>An error occurred</h2>
+                                        <p>Error: Failed to send your message</p>
+                                    </section>`;
+            document.querySelector("body main").insertAdjacentHTML("beforeend", errorSection); 
         }
     });
 }

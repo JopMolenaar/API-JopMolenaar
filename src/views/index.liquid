@@ -1,11 +1,15 @@
 {% layout "src/views/layouts/base.liquid" %}
 {% block head %}
   <link rel="stylesheet" href="/styles/login.css">
+  <link rel="stylesheet" href="/styles/error.css">
 {% endblock %}
 {% block contentMain %}
 <main>
   {% if errorMessage %}
-    <p>{{ errorMessage }}</p>
+    <section class="errorSection">
+      <h2>An error occurred</h2>
+      <p>Error: {{ errorMessage }}</p>
+    </section>
   {% endif %}
   <h1> {{ page }}</h1>
   <form

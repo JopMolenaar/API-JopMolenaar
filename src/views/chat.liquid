@@ -2,6 +2,7 @@
 {% block head %}
   <link rel="stylesheet" href="/styles/message.css">
   <link rel="stylesheet" href="/styles/emptyChat.css">
+  <link rel="stylesheet" href="/styles/error.css">
 {% endblock %}
 {% block contentHeader %}
 {% if showNotification %}
@@ -12,6 +13,12 @@
 {% endblock %}
 {% block contentMain %}
 <main>
+  {% if errorMessage %}
+    <section class="errorSection">
+      <h2>An error occurred</h2>
+      <p>Error: {{ errorMessage }}</p>
+    </section>
+  {% endif %}
   {% comment %} <h1>Send a message to {{ contact.name  }}</h1> {% endcomment %}
   {% if chatOpen %}
     <div class="chat-box">
@@ -82,14 +89,11 @@
       <img src="{{ currentUser.pfPicture }}" alt="pf">
       {% else %}
       <img src="/images/profileDefault.png" alt="pf">
-     {% endif %}
-
-      
+     {% endif %}      
       {{ chat.name }}</a></li>
     {% endfor %} 
   </ul>
 </section>
-
 </main>
 <script src="/js/extraFunctions.js"></script>
 <script src="/js/addMessage.js"></script>

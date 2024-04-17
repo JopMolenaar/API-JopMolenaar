@@ -25,8 +25,11 @@ contactForm.addEventListener("submit", async (event) => {
                     </li>`;
         contactList.insertAdjacentHTML("beforeend", html);
     } else {
-        console.error(`There is an error: ${data.message}`);
-        // TODO show error message
+        const errorSection = `  <section class="errorSection">
+                                    <h2>An error occurred</h2>
+                                    <p>Error: ${data.message}</p>
+                                </section>`;
+        document.querySelector("body main").insertAdjacentHTML("beforeend", errorSection);     
     }
 });
 

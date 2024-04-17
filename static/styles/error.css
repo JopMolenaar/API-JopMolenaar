@@ -1,0 +1,33 @@
+.errorSection {
+    position: absolute;
+    top: 0;
+    height: fit-content;
+    width: fit-content;
+    padding: 1em;
+    background-color: rgb(237, 237, 237);
+    border: solid red 4px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    color: black;
+    border-radius: 20px;
+    animation: hide 4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes hide {
+    0%{
+        transform: translate(-50%, -100%);
+    }
+    10%{
+        transform: translate(-50%, 0%);
+    }
+    90%{
+        transform: translate(-50%, 0%);
+    }
+    100%{
+        transform: translate(-50%, -100%);
+    }
+}
