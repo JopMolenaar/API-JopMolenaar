@@ -31,9 +31,11 @@
         <h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2></div>
       <section class="message-box">
         <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
-        {% for chat in chats %}
-          <p class="{{ chat.direction }}">{{ chat.fact.text }}</p>
-        {% endfor %}
+        <div>
+          {% for chat in chats %}
+            <p class="{{ chat.direction }}">{{ chat.fact.text }}</p>
+          {% endfor %}
+        </div>
       </section>
       <form action="/addMessageWithRefresh" method="post" class="textForm">
         <textarea placeholder="Enter text" id="textInput" name="text" cols="30" rows="10" required></textarea>

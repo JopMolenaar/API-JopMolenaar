@@ -3,7 +3,7 @@ const chatId = getIdFromUrl("chat");
 
 const empty = document.querySelector(".empty");
 if (!empty) {
-    const eventList = document.querySelector(".message-box");
+    const eventList = document.querySelector(".message-box div");
     const textForm = document.querySelector(".textForm");
     textForm.removeAttribute("action", "");
     textForm.removeAttribute("method", "");
@@ -23,7 +23,7 @@ if (!empty) {
                 newElement.classList.add("incoming");
             }
             if (message.chatId === chatId) {
-                newElement.textContent = `Message from ${message.from}: ${message.text}`;
+                newElement.textContent = `${message.text}`;
                 eventList.appendChild(newElement);
                 eventList.scrollTop = eventList.scrollHeight;
             }
