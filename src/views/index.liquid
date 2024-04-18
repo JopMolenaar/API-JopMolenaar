@@ -1,7 +1,7 @@
 {% layout "src/views/layouts/base.liquid" %}
 {% block head %}
-  <link rel="stylesheet" href="/styles/login.css">
-  <link rel="stylesheet" href="/styles/error.css">
+  <link rel="stylesheet" href="/styles/login.css?1">
+  <link rel="stylesheet" href="/styles/error.css?1">
 {% endblock %}
 {% block contentMain %}
 <main>
@@ -11,29 +11,32 @@
       <p>Error: {{ errorMessage }}</p>
     </section>
   {% endif %}
-  <h1> {{ page }}</h1>
-  <form
-    {% if page == "Sign-up" %}
-      action="/makeAccount" method="post"
-    {% else if page == "Log-in"  %}
-      action="/loginInAccount" method="post"
-    {% endif %}
-  >
-    <label>Name:
-      {% if inputValue %}
-        <input type="text" name="name" value="{{ inputValue }}">
-        {% else %}
-        <input type="text" name="name">
+  <div>
+    <h1> {{ page }}</h1>
+    <form
+      {% if page == "Sign-up" %}
+        action="/makeAccount" method="post"
+      {% else if page == "Log-in"  %}
+        action="/loginInAccount" method="post"
       {% endif %}
-    </label>
-    <button type="submit">{{ page }}</button>
-  </form>
-
-{% if page == "Sign-up" %}
-  <a href="/login">I already have an account.</a>
-{% else if page == "Log-in"  %}
-  <a href="/signup">I don't have a account yet.</a>
-{% endif %}
+    >
+      <label>Name:
+        {% if inputValue %}
+          <input type="text" name="name" value="{{ inputValue }}">
+          {% else %}
+          <input type="text" name="name">
+        {% endif %}
+      </label>
+      <button type="submit">{{ page }}</button>
+    </form>
+  
+  {% if page == "Sign-up" %}
+    <a href="/login">I already have an account.</a>
+  {% else if page == "Log-in"  %}
+    <a href="/signup">I don't have a account yet.</a>
+  {% endif %}
+  </div>
+  
 </main>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>

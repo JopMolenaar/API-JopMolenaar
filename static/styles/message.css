@@ -4,6 +4,8 @@ body {
     justify-content: space-between;
     flex-direction: column;
     height: 100svh;
+    position: fixed;
+    inset: 0;
 }
 img {
     width: 30px;
@@ -31,8 +33,7 @@ main {
     order: 2;
     display: grid;
     height: 100%;
-    grid-template-rows: 4em 1fr 4em;
-    /* position: relative; */
+    grid-template-rows: 4em calc(100vh - 9em) 5em;
 }
 .chat-box > div {
     background-color: var(--theme-color);
@@ -101,6 +102,8 @@ main {
     background-color:  var(--theme-color);
     padding: 0em 0em 1em 1em;
     padding: 0em 0em 1em 4em;
+    height: 5em;
+    transition: 400ms;
     & textarea {
         width: 70%;
         height: 3em;
@@ -337,5 +340,8 @@ main {
     .profile > button:nth-child(4) {
         opacity: 0;
         pointer-events: none;
+    }
+    .textForm {
+        left: 20em;
     }
 }
