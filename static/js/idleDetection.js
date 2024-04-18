@@ -1,18 +1,97 @@
-if ("IdleDetector" in window) {
-    async function runIdleDetection() {
+const threshold = 60000; // 1 minute
+const accountId = getIdFromUrl("account"); // id of account
+async function askIdleDetection() {
+    if ("IdleDetector" in window) {
         const state = await IdleDetector.requestPermission();
-        console.log(state);
+        if (state === "granted") {
+            localStorage.setItem("idlePermissionGranted", "true");
+            permissionGranted = true;
+        } else {
+            localStorage.setItem("idlePermissionGranted", "false");
+            // console.log("Idle detection permission denied.");
+            return; // Exit function if permission is denied
+        }
+        // console.log(state);
         const idleDetector = new IdleDetector();
 
-        idleDetector.addEventListener("change", () => {
+        idleDetector.addEventListener("change", async () => {
             const { userState, screenState } = idleDetector;
             if (userState == "idle") {
+                // console.log("userState is idle");
+                // console.log("screen:", screenState);
+                // update the db to offline
                 // Update db to away
+                updateDb("offline", accountId);
+            } else {
+                // console.log("user state is not idle");
+                // console.log("screen:", screenState);
+                // update the db to online
+                updateDb("online", accountId);
+            }
+            if (screenState === "locked") {
+                // update to offline
+                updateDb("offline", accountId);
+                // console.log("screen state locked");
             }
         });
 
         await idleDetector.start({
-            threshold: 120000,
+            threshold: threshold,
         });
+    }
+}
+
+async function runIdleDetection() {
+    if ("IdleDetector" in window) {
+        let permissionGranted = localStorage.getItem("idlePermissionGranted");
+
+        if (permissionGranted === "true") {
+            const idleDetector = new IdleDetector();
+
+            idleDetector.addEventListener("change", async () => {
+                const { userState, screenState } = idleDetector;
+                if (userState === "idle") {
+                    // console.log("User state is idle");
+                    // console.log("Screen state:", screenState);
+                    updateDb("offline", accountId);
+                } else {
+                    // console.log("User state is not idle");
+                    // console.log("Screen state:", screenState);
+                    updateDb("online", accountId);
+                }
+                if (screenState === "locked") {
+                    // console.log("Screen state is locked");
+                    updateDb("offline", accountId);
+                }
+            });
+
+            await idleDetector.start({
+                threshold: threshold, // Time threshold in milliseconds for idle detection
+            });
+        }
+    } else {
+        // console.log("Idle Detection API is not supported in this browser.");
+    }
+}
+runIdleDetection();
+
+async function updateDb(status, user) {
+    const response = await fetch("/updateStatus", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        // get the user from the url and send user id to the backend
+        body: JSON.stringify({ status, user }),
+    });
+    if (response.ok) {
+        // console.log("Text sent successfully");
+    } else {
+        console.error("Failed to update your status");
+        // const errorSection = `  <section class="errorSection">
+        //                             <h2>An error occurred</h2>
+        //                             <p>Error: Failed to update your status</p>
+        //                         </section>`;
+        // document.querySelector("body main").insertAdjacentHTML("beforeend", errorSection);
     }
 }

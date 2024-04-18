@@ -5,6 +5,7 @@ if (notiYesButton) {
         askPermission();
         getNotificationPermissionState();
         subscribeUserToPush();
+        askIdleDetection();
         notiHeader.style.display = "none";
     });
 }

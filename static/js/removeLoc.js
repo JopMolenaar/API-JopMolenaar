@@ -8,3 +8,9 @@ if (logoutButton) {
         removeIdToRemember(); // Remove "rememberAccount" from localStorage on logout
     });
 }
+
+
+const notFoundPage = document.querySelector("main > h1");
+if (notFoundPage && notFoundPage.textContent === "Page not found") {
+    removeIdToRemember();
+}

@@ -182,9 +182,6 @@ function eventsHandler(request, response, userId) {
     });
 }
 
-// TODO local storage dat je in bent gelogd, logd je meteen bij het opstarten van de app weer in.
-// TODO Als iemand uitlogd, local storage removen en sub verwijderen
-
 async function addFact(request, response, next) {
     const { text, userId, chatId, messageId, dateTime } = request.body;
     console.log("dateTime:", dateTime);
@@ -744,6 +741,11 @@ app.post("/delete-subscription/:id", function (req, res) {
         });
     return res.redirect(`/login`);
 });
+app.post("/updateStatus", function (req, res) {
+    const { status, user } = req.body;
+    console.log("status", status, "user", user);
+});
+
 
 ///////////////////////////////
 ///// extra shit comments /////

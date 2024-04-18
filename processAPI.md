@@ -29,3 +29,6 @@ Na een beetje styling te hebben toegevoegd, notifications werkend te hebben gekr
 - offline beschikbaar
 - 
 <!-- Add contact button styling -->
+
+<!-- // gedaan: local storage dat je in bent gelogd, logd je meteen bij het opstarten van de app weer in.
+// gedaan: Als iemand uitlogd, local storage removen en sub verwijderen -->
