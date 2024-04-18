@@ -1,8 +1,8 @@
 {% layout "src/views/layouts/base.liquid" %}
 {% block head %}
-  <link rel="stylesheet" href="/styles/message.css?3">
-  <link rel="stylesheet" href="/styles/emptyChat.css?3">
-  <link rel="stylesheet" href="/styles/error.css?3">
+  <link rel="stylesheet" href="/styles/message.css?4">
+  <link rel="stylesheet" href="/styles/emptyChat.css?5">
+  <link rel="stylesheet" href="/styles/error.css?2">
 {% endblock %}
 {% block contentHeader %}
 {% if showNotification %}
@@ -32,8 +32,41 @@
       <section class="message-box">
         <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
         <div>
+          {% comment %} {% for chat in chats %}
+            <p class="{{ chat.direction }}">{{ chat.fact.text }} <span><span class="visually-hidden">Time:</span>
+              {{ chat.fact.dateTime }}
+            </span>
+            {% if contact.pfPicture %}
+              <img src="{{ contact.pfPicture }}">
+              {% else %}
+              <img src="/images/profileDefault.png">
+            {% endif %}
+            </p>
+          {% endfor %} {% endcomment %}
           {% for chat in chats %}
-            <p class="{{ chat.direction }}">{{ chat.fact.text }}</p>
+            {% assign messageDate = chat.fact.dateTime | date: '%m/%d/%Y' %}
+            {% assign messageTime = chat.fact.dateTime | date: '%H:%M' %}
+            
+            {% capture currentDate %}{{ 'now' | date: '%m/%d/%Y' }}{% endcapture %}
+            {% capture messageDateFormatted %}{{ messageDate | date: '%m/%d/%Y' }}{% endcapture %}
+          
+            <p class="{{ chat.direction }}">
+              {{ chat.fact.text }}
+              <span>
+                <span class="visually-hidden">Time:</span>
+                {% if messageDateFormatted == currentDate %}
+                  {{ messageTime }}
+                {% else %}
+                  {{ messageDate }}
+                {% endif %}
+              </span>
+          
+              {% if contact.pfPicture %}
+                <img src="{{ contact.pfPicture }}">
+              {% else %}
+                <img src="/images/profileDefault.png">
+              {% endif %}
+            </p>
           {% endfor %}
         </div>
       </section>

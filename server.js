@@ -101,6 +101,7 @@ let facts = [
         from: "Jop",
         chatId: "3889220298",
         messageId: 0.148236156069004,
+        dateTime: "03/07/2024, 12:11",
     },
     {
         text: "Hoi Jop",
@@ -109,6 +110,7 @@ let facts = [
         from: "Mink",
         chatId: "3889220298",
         messageId: 0.891413494111438,
+        dateTime: "03/07/2024, 12:11",
     },
 ];
 
@@ -181,13 +183,14 @@ function eventsHandler(request, response, userId) {
 }
 
 async function addFact(request, response, next) {
-    const { text, userId, chatId, messageId } = request.body;
-    console.log(text, userId, chatId, messageId);
+    const { text, userId, chatId, messageId, dateTime } = request.body;
+    console.log("dateTime:", dateTime);
+    console.log(text, userId, chatId, messageId, dateTime);
     const senderName = users.find((u) => u.id === userId);
     const from = senderName.name;
     const currentReceiver = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== userId));
     const receiverId = currentReceiver.id;
-    const newFact = { text, userId, receiverId, from, chatId, messageId }; // Include receiverId in the newFact object
+    const newFact = { text, userId, receiverId, from, chatId, messageId, dateTime }; // Include receiverId in the newFact object
     facts.push(newFact);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
     sendPushNoti(request.body, receiverId);
@@ -607,7 +610,7 @@ app.get("/status", (request, response) => {
         .catch((error) => {
             console.error("Error loading JSON:", error);
         });
-}); 
+});
 
 app.get("/showUsers", (request, response) => response.json({ users: users }));
 
@@ -649,7 +652,7 @@ app.post("/fact", async (req, res) => {
     res.json(response.newFact);
 });
 app.post("/addMessageWithRefresh", async (req, res) => {
-    const { text, userId, chatId, messageId } = req.body;
+    const { text, userId, chatId, messageId, dateTime } = req.body;
     const response = await addFact(req, res);
     console.log(response);
     return res.redirect(`/account/${userId}/chat/${chatId}`);

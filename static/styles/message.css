@@ -75,17 +75,53 @@ main {
         justify-content: start;
         padding: 0.4em;
         min-height: min-content;
+        /* & p.away + p.away {
+            margin-top: 0;
+            & img{
+                display: none;
+            }
+        } */
         & p.away{
+            text-align: end;
             align-self: end;
+            margin-right: 1em;
+            & img {
+                right: 0;
+                transform: translate(90%, 25%);
+            }
         }
         & p.incoming{
             align-self: start;
+            margin-left: 1em;
+            & img {
+                left: 0;
+                transform: translate(-90%, 25%);
+            }
         }
-        & p{
+        & p {
+            display: grid;
             padding: 0.5rem;
-            background-color: #2946433e;
-            border-radius: 10px;
+            padding-bottom: 0em;
+            background-color: #ffffff;
+            border-radius: 3px;
             font-size: clamp(1em, 2vh, 1.1rem); 
+            position: relative;
+            margin: 0.2em;
+            & img {
+                position: absolute;
+                width: 20px;
+                border: solid black 1px;
+                border-radius: 50%;
+                bottom: 0;
+            }
+            & > span {
+                bottom: 0;
+                right: 0;
+                padding-top: 0.2rem;
+                padding-bottom: 0.2rem;
+                font-size: 0.7em;
+                color: rgb(41, 41, 41);
+            }
         }
     } 
 }
@@ -102,20 +138,20 @@ main {
     background-color:  var(--theme-color);
     padding: 0em 0em 1em 1em;
     padding: 0em 0em 1em 4em;
-    height: 5em;
+    height: 4em;
     transition: 400ms;
     & textarea {
         width: 70%;
         height: 3em;
         padding: 0.8em;
-        border-radius: 50px;
+        border-radius: 7px;
         resize: none;
         align-self: center;
     }
     & button {
         opacity: 0.5;
         pointer-events: none;
-        margin-top: 0.6em;
+        margin-top: 0.8em;
         width: 10%;
         border:none;
         background-color:  var(--theme-color);
@@ -180,23 +216,27 @@ main {
     position: relative;
     display: flex;
     justify-content: space-between;
-    height: 8vh;
+    height: 4em;
     padding-left: 1em;
     padding-right: 0.5em;
     align-items: center;
     > button {
         all: unset;
+        transition: 200ms;
         & img {
             filter: invert(100%);
             width: 3em;
         }
+    }
+    > button:hover {
+        scale: 1.1;
     }
     & div:nth-of-type(1) {
         display: flex;
         gap: 0.3em;
         & img {
             order: -1;
-            width: 50px;
+            width: 40px;
             max-width: none;
         }
     }
@@ -289,6 +329,8 @@ main {
             display: flex;
             justify-content: center;
             transition: 200ms;
+            width: fit-content;
+            align-self: end;
         }
         & button:hover {
             background-color: rgb(175, 175, 175);
@@ -302,17 +344,19 @@ main {
 .chats {
     margin: 0;
     padding: 0.2rem;
-    height: calc(98% - 8vh);
+    padding-top: 1em;
+    height: calc(100% - 4em);
     overflow-y: auto;
 }
 .chats li{
     list-style: none;
     display: flex;
     justify-content: center;
-    border-bottom: white solid 2px;
-    border-bottom: color-mix(in srgb, var(--theme-color), white 70%) solid 2px;
+    /* border-bottom: white solid 2px; */
+    /* border-bottom: color-mix(in srgb, var(--theme-color), white 70%) solid 2px; */
     /* background-color: #0a4a44; */
     width: 100%;
+
 }
 .chats li a{
     color: white;
@@ -324,11 +368,17 @@ main {
     padding: 0.5em;
     align-items: center;
     gap: 0.5em;
+    background-color: color-mix(in srgb, var(--theme-color), white 20%);
+    border-radius: 5px;
+    transition: 200ms;
     & img {
         border-radius: 50%;
     }
 }
-
+.chats li a:hover{
+    background-color: color-mix(in srgb, var(--theme-color), white 10%);
+    border-radius: 0px;
+}
 @media (min-width: 60em){
     main {
         grid-template-columns: 20em 1fr;
