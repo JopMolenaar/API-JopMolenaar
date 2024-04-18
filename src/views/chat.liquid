@@ -104,13 +104,15 @@
 
       <div class="profileMenu">
         <button><img src="/images/close.png" alt="settings symbol"></button>
-        <a href="/login">Log out</a>
+        <form method="post" action="/delete-subscription/{{ currentUser.id }}">
+        <button>Log out</button></form>
+        {% comment %} <a method="post" action="/delete-subscription/{{ currentUser.id }}">Log out</a> {% endcomment %}
         <h4>Add new contact:</h4>
         <form action="/addContact" id="addContact" method="post">
           <label>Name:
             <input type="text" name="name">
           </label>
-          <input type="hidden" name="userId" value="{{ user.id }}">
+          <input type="hidden" name="userId" value="{{ currentUser.id }}">
           <button type="submit">Add contact</button>
        </form>
         {% comment %} <a href="/settings/{{  currentUser.id }}"></a> {% endcomment %}
@@ -134,5 +136,6 @@
 <script src="/js/addMessage.js"></script>
 <script src="/js/addContact.js"></script>
 <script src="/js/profilePopup.js"></script>
+<script src="/js/removeLoc.js"></script>
 <script src="/js/sw.js"></script>
 {% endblock %}

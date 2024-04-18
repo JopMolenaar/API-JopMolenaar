@@ -182,6 +182,9 @@ function eventsHandler(request, response, userId) {
     });
 }
 
+// TODO local storage dat je in bent gelogd, logd je meteen bij het opstarten van de app weer in.
+// TODO Als iemand uitlogd, local storage removen en sub verwijderen
+
 async function addFact(request, response, next) {
     const { text, userId, chatId, messageId, dateTime } = request.body;
     console.log("dateTime:", dateTime);
@@ -189,6 +192,7 @@ async function addFact(request, response, next) {
     const senderName = users.find((u) => u.id === userId);
     const from = senderName.name;
     const currentReceiver = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== userId));
+    // TODO if receiver is online, stuur het dan niet, als ie niet online is, stuur het dan wel.
     const receiverId = currentReceiver.id;
     const newFact = { text, userId, receiverId, from, chatId, messageId, dateTime }; // Include receiverId in the newFact object
     facts.push(newFact);
@@ -543,7 +547,7 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
     if (currentUser && currentContact) {
         let allChats = [];
-        console.log("facts:", facts);
+        // console.log("facts:", facts);
         facts.forEach((fact) => {
             if (fact.chatId === chatId) {
                 let direction;
@@ -712,6 +716,33 @@ app.post("/save-subscription/:id", function (req, res) {
         console.error("Error parsing JSON:", error.message);
         res.status(400).send("Invalid JSON data");
     }
+});
+
+app.post("/delete-subscription/:id", function (req, res) {
+    const userId = req.params.id;
+    loadJSON(subsDB)
+        .then((allSubscribers) => {
+            if (allSubscribers) {
+                allSubscribers.forEach((sub) => {
+                    if (sub.userId === userId) {
+                        const index = allSubscribers.indexOf(sub);
+                        if (index > -1) {
+                            // only splice array when item is found
+                            allSubscribers.splice(index, 1); // 2nd parameter means remove one item only
+                        }
+                        // Save updated JSON data to file
+                        saveJSON(subsDB, allSubscribers);
+                        console.log("JSON data saved successfully.");
+                    }
+                });
+            } else {
+                console.log("File does not exist or is empty.");
+            }
+        })
+        .catch((error) => {
+            console.error("Error loading or saving JSON:", error);
+        });
+    return res.redirect(`/login`);
 });
 
 ///////////////////////////////

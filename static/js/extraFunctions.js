@@ -16,3 +16,13 @@ function fillInPrevMessages() {
         });
     }
 }
+
+// Function to set "rememberAccount" in localStorage with the provided ID
+const setIdToRemember = (id) => {
+    localStorage.setItem("rememberAccount", id);
+};
+
+// Function to remove "rememberAccount" from localStorage
+const removeIdToRemember = () => {
+    localStorage.removeItem("rememberAccount");
+};
