@@ -1,4 +1,4 @@
-const contactId = document.querySelector("input[name=contactId]").value;
+const contactId = document.querySelector("input[name=contactId]");
 const pForStatus = document.getElementById("statusOfContact");
 
 if (contactId) {
@@ -7,7 +7,7 @@ if (contactId) {
 }
 
 async function getContactStatus() {
-    await fetch(`/getStatusContact/${contactId}`).then(async (response) => {
+    await fetch(`/getStatusContact/${contactId.value}`).then(async (response) => {
         if (response.ok) {
             const data = await response.json();
             pForStatus.textContent = data.status;

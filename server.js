@@ -643,13 +643,17 @@ app.get("/getAllContacts/:id", async (req, res) => {
     let allContacts = [];
     const userId = req.params.id;
     const currentUser = users.find((user) => user.id === userId);
-    console.log("CURRENT USER: ", currentUser);
-    currentUser.contacts.forEach((contact) => {
-        const chat = currentUser.chats.find((c) => c.contactId === contact.id);
-        const chatId = chat.id;
-        allContacts.push({ contact, chatId });
-    });
-    res.json({ allContacts });
+    if (currentUser) {
+        console.log("CURRENT USER: ", currentUser);
+        currentUser.contacts.forEach((contact) => {
+            const chat = currentUser.chats.find((c) => c.contactId === contact.id);
+            const chatId = chat.id;
+            allContacts.push({ contact, chatId });
+        });
+        res.json({ allContacts });
+    } else {
+        return res.status(500).send("There is an error");
+    }
 });
 
 ///////////////////////////////
@@ -691,15 +695,10 @@ app.post("/addContactJs", async (req, res) => {
 app.post("/save-subscription/:id", function (req, res) {
     const userId = req.params.id;
     console.log(userId);
-    // const { userId, subscription } = req.body;
-    // console.log(req.body);
-    // console.log("User id:", userId);
     if (!isValidSaveRequest(req, res)) {
         return;
     }
     try {
-        // const subscriptionData = JSON.parse(req.body);
-        // console.log(subscriptionData);
         return saveSubscriptionToDatabase(req.body, userId)
             .then((subscriptionId) => {
                 res.setHeader("Content-Type", "application/json");
