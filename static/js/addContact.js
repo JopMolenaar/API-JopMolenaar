@@ -1,3 +1,4 @@
+const profileMenu = document.querySelector(".profileMenu");
 const contactForm = document.querySelector("#addContact");
 contactForm.removeAttribute("action", "");
 contactForm.removeAttribute("method", "");
@@ -16,6 +17,7 @@ contactForm.addEventListener("submit", async (event) => {
     });
     const data = await response.json();
     if (!data.error) {
+        profileMenu.style.display = "none";
         const chat = ` <li>
                             <span class="visually-hidden">Chat with: </span>
                             <a href="/account/${userId}/chat/${data.chatId}">
