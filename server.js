@@ -64,6 +64,7 @@ let users = [
             {
                 id: "3889220298",
                 name: "Jop",
+                contactId: "37157981",
             },
         ],
         contacts: [
@@ -83,6 +84,7 @@ let users = [
             {
                 id: "3889220298",
                 name: "Mink",
+                contactId: "65956570",
             },
         ],
         contacts: [
@@ -269,6 +271,7 @@ function addUser(req, res) {
 function addContact(req, res) {
     const { name, userId } = req.body;
     console.log(name, userId);
+    let chatId;
     const userToAddContact = users.find((u) => u.id === userId);
     const contactToAdd = users.find((u) => u.name === name);
     if (contactToAdd === userToAddContact) {
@@ -294,33 +297,35 @@ function addContact(req, res) {
         };
         userToAddContact.contacts.push(newContactForUser);
         contactToAdd.contacts.push(newContact);
+
+        chatId = addChat(contactToAdd, userToAddContact);
     } else {
         return { status: 400, message: "Contact already exists", error: true };
     }
 
-    return { status: 201, message: "contact added succesfully", userId: userToAddContact.id, contactId: contactToAdd.id, contactName: contactToAdd.name };
+    return {
+        status: 201,
+        message: "contact added succesfully",
+        userId: userToAddContact.id,
+        contactId: contactToAdd.id,
+        contactName: contactToAdd.name,
+        chatId,
+    };
 }
 
-function addChat(req, res) {
-    const { contact, user } = req.body;
-
-    const userToAddChat = users.find((u) => u.id === user);
-    const contactToAddChat = users.find((u) => u.id === contact);
-
-    if (!userToAddChat || !contactToAddChat) {
-        return res.status(404).send("User or contact not found");
-    }
-
+function addChat(contactToAddChat, userToAddChat) {
     // Generate a random 10-digit ID for the chat
     const chatId = generateUniqueId(chats);
     chats.push({ id: chatId });
     const newChatUser = {
         id: chatId,
         name: contactToAddChat.name,
+        contactId: contactToAddChat.id,
     };
     const newChatContact = {
         id: chatId,
         name: userToAddChat.name,
+        contactId: userToAddChat.id,
     };
     const setChatToTrueContact = contactToAddChat.contacts.find((c) => c.id === userToAddChat.id);
     const setChatToTrueUser = userToAddChat.contacts.find((c) => c.id === contactToAddChat.id);
@@ -329,9 +334,7 @@ function addChat(req, res) {
     // Update chats array for both user and contact
     userToAddChat.chats.push(newChatUser);
     contactToAddChat.chats.push(newChatContact);
-
-    // Redirect to the chat page
-    return res.redirect(`/account/${userToAddChat.id}/chat/${chatId}`);
+    return chatId;
 }
 
 function verifyUser(req, res) {
@@ -636,36 +639,22 @@ app.get("/getStatusContact/:id", (req, res) => {
     res.json({ status });
 });
 
+app.get("/getAllContacts/:id", async (req, res) => {
+    let allContacts = [];
+    const userId = req.params.id;
+    const currentUser = users.find((user) => user.id === userId);
+    console.log("CURRENT USER: ", currentUser);
+    currentUser.contacts.forEach((contact) => {
+        const chat = currentUser.chats.find((c) => c.contactId === contact.id);
+        const chatId = chat.id;
+        allContacts.push({ contact, chatId });
+    });
+    res.json({ allContacts });
+});
+
 ///////////////////////////////
 ////////// app.post ///////////
 ///////////////////////////////
-
-// app.post("/checkForChat", (req, res) => {
-//     let dataToReturn = [];
-//     const allData = req.body;
-//     if (allData[0]) {
-//         allData.forEach((data) => {
-//             const foundUser = users.find((u) => u.id === data.user);
-//             console.log("FOUND USER:", foundUser.name, "LI DATA CONTACTS:", data);
-//             let foundContact;
-//             if (data.contact) {
-//                 // TODO check if there is an existing chat
-//             } else {
-//                 // TODO check if there is a new contact
-//                 const newContact = foundUser.contacts.find((c) => c.name !== data.name);
-//                 if (newContact) {
-//                     dataToReturn.push({ message: "New contact", contact: newContact });
-//                     console.log("NEW CONTACT:", newContact);
-//                 } else {
-//                     dataToReturn.push({ message: "No new contact" });
-//                 }
-//                 return res.status(200).send({ dataToReturn });
-//             }
-//         });
-//         return res.status(200).send({ message: "content send" });
-//     }
-//     return res.status(200).send({ message: "no content send" });
-// });
 
 app.post("/fact", async (req, res) => {
     const response = await addFact(req, res);
@@ -698,7 +687,6 @@ app.post("/addContactJs", async (req, res) => {
     console.log(response);
     return res.status(200).send(response);
 });
-app.post("/addChat", addChat);
 
 app.post("/save-subscription/:id", function (req, res) {
     const userId = req.params.id;
@@ -762,6 +750,7 @@ app.post("/delete-subscription/:id", function (req, res) {
         });
     return res.redirect(`/login`);
 });
+
 app.post("/updateStatus", function (req, res) {
     const { status, userId } = req.body;
     console.log("status", status, "user", userId);

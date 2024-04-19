@@ -98,7 +98,6 @@
         <button><img src="/images/close.png" alt="settings symbol"></button>
         <form method="post" action="/delete-subscription/{{ currentUser.id }}">
         <button>Log out</button></form>
-        {% comment %} <a method="post" action="/delete-subscription/{{ currentUser.id }}">Log out</a> {% endcomment %}
         <h4>Add new contact:</h4>
         <form action="/addContact" id="addContact" method="post">
           <label>Name:
@@ -130,4 +129,5 @@
 <script src="/js/idleDetection.js"></script>
 <script src="/js/sw.js"></script>
 <script src="/js/fetchStatus.js"></script>
+<script src="/js/fetchContacts.js"></script>
 {% endblock %}
