@@ -21,16 +21,16 @@ async function askIdleDetection() {
                 // console.log("screen:", screenState);
                 // update the db to offline
                 // Update db to away
-                updateDb("offline", accountId);
+                updateDb("Offline", accountId);
             } else {
                 // console.log("user state is not idle");
                 // console.log("screen:", screenState);
                 // update the db to online
-                updateDb("online", accountId);
+                updateDb("Online", accountId);
             }
             if (screenState === "locked") {
                 // update to offline
-                updateDb("offline", accountId);
+                updateDb("Offline", accountId);
                 // console.log("screen state locked");
             }
         });
@@ -53,15 +53,15 @@ async function runIdleDetection() {
                 if (userState === "idle") {
                     // console.log("User state is idle");
                     // console.log("Screen state:", screenState);
-                    updateDb("offline", accountId);
+                    updateDb("Offline", accountId);
                 } else {
                     // console.log("User state is not idle");
                     // console.log("Screen state:", screenState);
-                    updateDb("online", accountId);
+                    updateDb("Online", accountId);
                 }
                 if (screenState === "locked") {
                     // console.log("Screen state is locked");
-                    updateDb("offline", accountId);
+                    updateDb("Offline", accountId);
                 }
             });
 

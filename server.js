@@ -59,7 +59,7 @@ let users = [
     {
         id: "65956570",
         name: "Mink",
-        status: "offline",
+        status: "Offline",
         chats: [
             {
                 id: "3889220298",
@@ -78,7 +78,7 @@ let users = [
     {
         id: "37157981",
         name: "Jop",
-        status: "offline",
+        status: "Offline",
         chats: [
             {
                 id: "3889220298",
@@ -253,7 +253,7 @@ function addUser(req, res) {
     const newUser = {
         id: id,
         name: name,
-        status: "offline",
+        status: "Offline",
         chats: [],
         contacts: [],
         pfPicture: "/icons/black.jpeg",
@@ -628,6 +628,13 @@ app.get("/status", (request, response) => {
 });
 
 app.get("/showUsers", (request, response) => response.json({ users: users }));
+
+app.get("/getStatusContact/:id", (req, res) => {
+    const contactId = req.params.id;
+    const currentContact = users.find((user) => user.id === contactId);
+    const status = currentContact.status;
+    res.json({ status });
+});
 
 ///////////////////////////////
 ////////// app.post ///////////

@@ -1,16 +1,19 @@
 {% layout "src/views/layouts/base.liquid" %}
+
 {% block head %}
   <link rel="stylesheet" href="/styles/message.css?4">
   <link rel="stylesheet" href="/styles/emptyChat.css?5">
   <link rel="stylesheet" href="/styles/error.css?2">
 {% endblock %}
+
 {% block contentHeader %}
-{% if showNotification %}
-  <header>
-      {% render '../components/noti.liquid' %}
-  </header>
-{% endif %}
+  {% if showNotification %}
+    <header>
+        {% render '../components/noti.liquid' %}
+    </header>
+  {% endif %}
 {% endblock %}
+
 {% block contentMain %}
 <main>
   {% if errorMessage %}
@@ -19,7 +22,6 @@
       <p>Error: {{ errorMessage }}</p>
     </section>
   {% endif %}
-  {% comment %} <h1>Send a message to {{ contact.name  }}</h1> {% endcomment %}
   {% if chatOpen %}
     <div class="chat-box">
       <div>
@@ -28,21 +30,10 @@
           {% else %}
           <img src="/images/profileDefault.png" alt="profile picture">
         {% endif %}
-        <h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2><p><span class="visually-hidden">Status: </span>{{ contact.status }}</p></div>
+        <h2><span class="visually-hidden">You are messaging: </span>{{ contact.name }}</h2><p id="statusOfContact"><span class="visually-hidden">Status: </span>{{ contact.status }}</p></div>
       <section class="message-box">
         <h2 class="visually-hidden">All the messages of the chat are shown here:</h2>
         <div>
-          {% comment %} {% for chat in chats %}
-            <p class="{{ chat.direction }}">{{ chat.fact.text }} <span><span class="visually-hidden">Time:</span>
-              {{ chat.fact.dateTime }}
-            </span>
-            {% if contact.pfPicture %}
-              <img src="{{ contact.pfPicture }}">
-              {% else %}
-              <img src="/images/profileDefault.png">
-            {% endif %}
-            </p>
-          {% endfor %} {% endcomment %}
           {% for chat in chats %}
             {% assign messageDate = chat.fact.dateTime | date: '%m/%d/%Y' %}
             {% assign messageTime = chat.fact.dateTime | date: '%H:%M' %}
@@ -75,6 +66,7 @@
         <input type="hidden" name="messageId" value="0" >
         <input type="hidden" name="icon" value="/icon/iconportfoliozwart.png">
         <input type="hidden" name="chatId" value="{{ chatId }}">
+        <input type="hidden" name="contactId" value="{{ contact.id }}">
         <input type="hidden" name="userId" value="{{ currentUser.id }}">
         <button type="submit"><span class="visually-hidden">Send Text</span><img src="/icons/send.svg" alt=""> </button>
       </form>
@@ -115,10 +107,8 @@
           <input type="hidden" name="userId" value="{{ currentUser.id }}">
           <button type="submit">Add contact</button>
        </form>
-        {% comment %} <a href="/settings/{{  currentUser.id }}"></a> {% endcomment %}
       </div>
   </section>
-  {% comment %} // TODO click on profiel and a menu shows up with a logout button + seetings link to settings page? {% endcomment %}
   <ul class="chats">
     {% for chat in currentUser.chats %}
       <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}">
@@ -139,4 +129,5 @@
 <script src="/js/removeLoc.js"></script>
 <script src="/js/idleDetection.js"></script>
 <script src="/js/sw.js"></script>
+<script src="/js/fetchStatus.js"></script>
 {% endblock %}
