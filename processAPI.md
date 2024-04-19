@@ -25,9 +25,19 @@ Styling (mag best styling van een bestaande app), animaties (zijn een leuke toev
 Deze week ben ik druk bezig geweest met het beetje stylen van de webpagina, ik vindt het nog steeds erg moeilijk om zomaar even css te schrijven zonder er een design naast mij ligt en ik ben ook niet zo van het eerst desginen van mijn website. Ik ondervond problemen met de styling op mobiel, dit leek erg te verschillen met wat ik op mijn macbook had gemaakt. Dit kwam uiteindelijk doordat deze regel miste in de head van mijn pagina: `<meta name="viewport" content="width=device-width, initial-scale=1.0">`. 
 
 Na een beetje styling te hebben toegevoegd, notifications werkend te hebben gekregen, had ik nog een aantal dingen op mijn lijstje die ik nog graag wilde doen. Dat waren:
-- Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beelt moet blijven staan.
-- offline beschikbaar
-- 
+
+- [x] Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beeld moet blijven staan.
+
+- [ ] Contacten en chats tegelijk toevoegen en makkelijker maken, ook fetchen bij de ander
+- [ ] online of offline status fetchen van je contact.
+- [ ] Alleen noti's sturen als je offline bent. 
+
+- [ ] normale pf picture 
+- [ ] Iets betere styling (status, login)
+- [ ] gsap animaion als je een bericht stuurt of als je bepaalde emoji's stuurt
+
+- [ ] password toevoegen
+- [ ] offline beschikbaar
 <!-- Add contact button styling -->
 
 <!-- // gedaan: local storage dat je in bent gelogd, logd je meteen bij het opstarten van de app weer in.

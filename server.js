@@ -59,6 +59,7 @@ let users = [
     {
         id: "65956570",
         name: "Mink",
+        status: "offline",
         chats: [
             {
                 id: "3889220298",
@@ -77,6 +78,7 @@ let users = [
     {
         id: "37157981",
         name: "Jop",
+        status: "offline",
         chats: [
             {
                 id: "3889220298",
@@ -174,11 +176,22 @@ function eventsHandler(request, response, userId) {
         response,
     };
 
+    const currentUser = users.find((user) => user.id == userId);
+    if (currentUser) {
+        currentUser.status = "Online";
+    }
+
+    // TODO set status from the user that has userId to online
     clients.push(newClient);
 
     request.on("close", () => {
         console.log(`${clientId} Connection closed`);
         clients = clients.filter((client) => client.id !== clientId);
+        // TODO set status from the user that has client.userId to offline
+        const currentUser = users.find((user) => user.id == userId);
+        if (currentUser) {
+            currentUser.status = "Offline";
+        }
     });
 }
 
@@ -240,6 +253,7 @@ function addUser(req, res) {
     const newUser = {
         id: id,
         name: name,
+        status: "offline",
         chats: [],
         contacts: [],
         pfPicture: "/icons/black.jpeg",
@@ -742,8 +756,15 @@ app.post("/delete-subscription/:id", function (req, res) {
     return res.redirect(`/login`);
 });
 app.post("/updateStatus", function (req, res) {
-    const { status, user } = req.body;
-    console.log("status", status, "user", user);
+    const { status, userId } = req.body;
+    console.log("status", status, "user", userId);
+    const currentUser = users.find((user) => user.id == userId);
+    if (currentUser) {
+        currentUser.status = status;
+        res.status(200).send("status updated");
+    } else {
+        res.status(400).send("User doesn't exists");
+    }
 });
 
 

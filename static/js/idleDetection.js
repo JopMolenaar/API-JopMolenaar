@@ -76,13 +76,14 @@ async function runIdleDetection() {
 runIdleDetection();
 
 async function updateDb(status, user) {
+    console.log(status, user);
     const response = await fetch("/updateStatus", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
         // get the user from the url and send user id to the backend
-        body: JSON.stringify({ status, user }),
+        body: JSON.stringify({ status, userId: user }),
     });
     if (response.ok) {
         // console.log("Text sent successfully");
