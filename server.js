@@ -39,41 +39,18 @@ const usersDB = "database/users.json";
 // const clientsDB = "database/clients.json";
 const chatsDB = "database/chats.json";
 const subsDB = "database/subs.json";
-// const messagesDB = "database/messages.json";
+const messagesDB = "database/messages.json";
+let clients = [];
 
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
 });
 
 ///////////////////////////////
-///////// Stored data /////////
-///////////////////////////////
-let clients = [];
-let facts = [
-    {
-        text: "Hoi Mink",
-        userId: "37157981",
-        receiverId: "65956570",
-        from: "Jop",
-        chatId: "3889220298",
-        messageId: 0.148236156069004,
-        dateTime: "03/07/2024, 12:11",
-    },
-    {
-        text: "Hoi Jop",
-        userId: "65956570",
-        receiverId: "37157981",
-        from: "Mink",
-        chatId: "3889220298",
-        messageId: 0.891413494111438,
-        dateTime: "03/07/2024, 12:11",
-    },
-];
-
-///////////////////////////////
 ////////// Functions //////////
 ///////////////////////////////
 function loadJSON(filename) {
+    console.log("Get:", filename);
     if (fs.existsSync(filename)) {
         // Read file asynchronously and parse JSON data
         return new Promise((resolve, reject) => {
@@ -89,6 +66,7 @@ function loadJSON(filename) {
 }
 
 function saveJSON(filename, json) {
+    console.log(filename);
     return fs.writeFileSync(filename, JSON.stringify(json));
 }
 
@@ -107,7 +85,7 @@ async function eventsHandler(request, response, userId) {
         "Cache-Control": "no-cache",
     };
     response.writeHead(200, headers);
-
+    // const clients = await loadJSON(clientsDB);
     clients.forEach((client) => {
         if (client.userId === userId) {
             const dupliId = client.userId;
@@ -117,8 +95,8 @@ async function eventsHandler(request, response, userId) {
     });
 
     console.log(`User: ${userId} Connection opened`);
-
-    const data = `data: ${JSON.stringify(facts)}\n\n`;
+    const messages = await loadJSON(messagesDB);
+    const data = `data: ${JSON.stringify(messages)}\n\n`;
 
     response.write(data);
 
@@ -152,6 +130,7 @@ async function eventsHandler(request, response, userId) {
             currentUser.status = "Offline";
         }
     });
+    console.log("clients:", clients);
     saveJSON(usersDB, usersJSON);
 }
 
@@ -166,7 +145,9 @@ async function addFact(request, response, next) {
     // TODO if receiver is online, stuur het dan niet, als ie niet online is, stuur het dan wel.
     const receiverId = currentReceiver.id;
     const newFact = { text, userId, receiverId, from, chatId, messageId, dateTime }; // Include receiverId in the newFact object
-    facts.push(newFact);
+    const messages = await loadJSON(messagesDB);
+    messages.push(newFact);
+    saveJSON(messagesDB, messages);
     saveJSON(usersDB, usersJSON);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
     sendPushNoti(request.body, receiverId);
@@ -174,7 +155,8 @@ async function addFact(request, response, next) {
     return { newFact, redirect: `/account/${userId}/chat/${chatId}` };
 }
 
-function sendEventsToChat(newFact, chatId) {
+async function sendEventsToChat(newFact, chatId) {
+    // const clients = await loadJSON(clientsDB);
     clients.forEach((client) => {
         console.log("id's: ", client.userId);
     });
@@ -535,7 +517,8 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     if (currentUser && currentContact) {
         let allChats = [];
         // console.log("facts:", facts);
-        facts.forEach((fact) => {
+        const messages = await loadJSON(messagesDB);
+        messages.forEach((fact) => {
             if (fact.chatId === chatId) {
                 let direction;
                 if (fact.userId === clientId) {
@@ -596,9 +579,10 @@ app.get("/account/:id/makeChatWith/:contactId", async (req, res) => {
 
 app.get("/status", async (request, response) => {
     const usersJSON = await loadJSON(usersDB);
+    const messages = await loadJSON(messagesDB);
     loadJSON(subsDB)
         .then((data) => {
-            response.json({ users: usersJSON, facts: facts, allSubscribers: data });
+            response.json({ users: usersJSON, facts: messages, allSubscribers: data });
             // Proceed with data processing or other operations
         })
         .catch((error) => {
