@@ -35,7 +35,7 @@ const PORT = process.env.PORT || 4000;
 ///////////////////////////////
 /////// DATABASES (json) //////
 ///////////////////////////////
-// const usersDB = "database/users.json";
+const usersDB = "database/users.json";
 // const clientsDB = "database/clients.json";
 // const chatsDB = "database/chats.json";
 const subsDB = "database/subs.json";
@@ -45,7 +45,6 @@ app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
 });
 
-
 ///////////////////////////////
 ///////// Stored data /////////
 ///////////////////////////////
@@ -53,48 +52,6 @@ let clients = [];
 let chats = [
     {
         id: "3889220298",
-    },
-];
-let users = [
-    {
-        id: "65956570",
-        name: "Mink",
-        status: "Offline",
-        chats: [
-            {
-                id: "3889220298",
-                name: "Jop",
-                contactId: "37157981",
-            },
-        ],
-        contacts: [
-            {
-                id: "37157981",
-                name: "Jop",
-                existingChat: true,
-            },
-        ],
-        // pfPicture: "/icons/black.jpeg",
-    },
-    {
-        id: "37157981",
-        name: "Jop",
-        status: "Offline",
-        chats: [
-            {
-                id: "3889220298",
-                name: "Mink",
-                contactId: "65956570",
-            },
-        ],
-        contacts: [
-            {
-                id: "65956570",
-                name: "Mink",
-                existingChat: true,
-            },
-        ],
-        // pfPicture: "/icons/black.jpeg",
     },
 ];
 let facts = [
@@ -148,7 +105,7 @@ function renderTemplate(template, data) {
     return engine.renderFileSync(template, templateData);
 }
 
-function eventsHandler(request, response, userId) {
+async function eventsHandler(request, response, userId) {
     const headers = {
         "Content-Type": "text/event-stream",
         Connection: "keep-alive",
@@ -178,7 +135,12 @@ function eventsHandler(request, response, userId) {
         response,
     };
 
-    const currentUser = users.find((user) => user.id == userId);
+    const usersJSON = await loadJSON(usersDB);
+    console.log("USERS: ", usersJSON);
+
+    // saveJSON(usersDB, usersJSON);
+
+    const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
         currentUser.status = "Online";
     }
@@ -190,26 +152,30 @@ function eventsHandler(request, response, userId) {
         console.log(`${clientId} Connection closed`);
         clients = clients.filter((client) => client.id !== clientId);
         // TODO set status from the user that has client.userId to offline
-        const currentUser = users.find((user) => user.id == userId);
+        const currentUser = usersJSON.find((user) => user.id == userId);
         if (currentUser) {
             currentUser.status = "Offline";
         }
     });
+    saveJSON(usersDB, usersJSON);
 }
 
 async function addFact(request, response, next) {
     const { text, userId, chatId, messageId, dateTime } = request.body;
-    console.log("dateTime:", dateTime);
-    console.log(text, userId, chatId, messageId, dateTime);
-    const senderName = users.find((u) => u.id === userId);
+    // console.log("dateTime:", dateTime);
+    // console.log(text, userId, chatId, messageId, dateTime);
+    const usersJSON = await loadJSON(usersDB);
+    const senderName = usersJSON.find((u) => u.id === userId);
     const from = senderName.name;
-    const currentReceiver = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== userId));
+    const currentReceiver = usersJSON.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== userId));
     // TODO if receiver is online, stuur het dan niet, als ie niet online is, stuur het dan wel.
     const receiverId = currentReceiver.id;
     const newFact = { text, userId, receiverId, from, chatId, messageId, dateTime }; // Include receiverId in the newFact object
     facts.push(newFact);
+    saveJSON(usersDB, usersJSON);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
     sendPushNoti(request.body, receiverId);
+
     return { newFact, redirect: `/account/${userId}/chat/${chatId}` };
 }
 
@@ -242,16 +208,18 @@ function generateUniqueId(array) {
     return id;
 }
 
-function addUser(req, res) {
+async function addUser(req, res) {
     const { name } = req.body;
+
+    const usersJSON = await loadJSON(usersDB);
     // Check if the user already exists
-    const existingUser = users.find((user) => user.name === name);
+    const existingUser = usersJSON.find((user) => user.name === name);
     if (existingUser) {
         return res.send(renderTemplate("src/views/index.liquid", { page: "Sign-up", errorMessage: `User: ${name} already exists`, inputValue: name }));
     }
 
     // Generate a unique ID for the new user
-    const id = generateUniqueId(users);
+    const id = generateUniqueId(usersJSON);
     const newUser = {
         id: id,
         name: name,
@@ -261,19 +229,23 @@ function addUser(req, res) {
         pfPicture: "/icons/black.jpeg",
     };
 
-    users.push(newUser);
-    console.log("All users:", users);
-
+    usersJSON.push(newUser);
+    console.log("All users:", usersJSON);
+    saveJSON(usersDB, usersJSON);
     // Redirect to the account page of the new added user
     return res.redirect(`/account/${id}`);
 }
 
-function addContact(req, res) {
+async function addContact(req, res) {
     const { name, userId } = req.body;
+
+    const usersJSON = await loadJSON(usersDB);
+    console.log("USERS: ", usersJSON);
+
     console.log(name, userId);
     let chatId;
-    const userToAddContact = users.find((u) => u.id === userId);
-    const contactToAdd = users.find((u) => u.name === name);
+    const userToAddContact = usersJSON.find((u) => u.id === userId);
+    const contactToAdd = usersJSON.find((u) => u.name === name);
     if (contactToAdd === userToAddContact) {
         return { status: 400, message: "You cant add yourself", error: true };
     }
@@ -302,7 +274,7 @@ function addContact(req, res) {
     } else {
         return { status: 400, message: "Contact already exists", error: true };
     }
-
+    saveJSON(usersDB, usersJSON);
     return {
         status: 201,
         message: "contact added succesfully",
@@ -337,9 +309,10 @@ function addChat(contactToAddChat, userToAddChat) {
     return chatId;
 }
 
-function verifyUser(req, res) {
+async function verifyUser(req, res) {
     const { name } = req.body;
-    const existingUser = users.find((user) => user.name === name);
+    const usersJSON = await loadJSON(usersDB);
+    const existingUser = usersJSON.find((user) => user.name === name);
     if (!existingUser) {
         return res.send(renderTemplate("src/views/index.liquid", { page: "Log-in", errorMessage: `User: ${name} doesn't exists`, inputValue: name }));
     }
@@ -478,10 +451,11 @@ function saveSubscriptionToDatabase(subscription, userId) {
     });
 }
 
-function sendPushNoti(data, sendTo) {
+async function sendPushNoti(data, sendTo) {
     // const { title, body, icon, userId } = data;
     const { text, userId, icon } = data;
-    const currentUser = users.find((u) => u.id === userId);
+    const usersJSON = await loadJSON(usersDB);
+    const currentUser = usersJSON.find((u) => u.id === userId);
     const dataToSend = { title: `Message from ${currentUser.name}`, body: text, icon };
     const payload = JSON.stringify(dataToSend);
     // TODO = logic to send it to the right person if that person is not online
@@ -520,10 +494,11 @@ app.get("/account/:id", async (req, res) => {
     const error = req.query.error; // Retrieve error message from query parameter
     const clientId = req.params.id;
     let currentUser;
-    if (!users[0]) {
+    const usersJSON = await loadJSON(usersDB);
+    if (!usersJSON[0]) {
         return res.send(renderTemplate("src/views/notFound.liquid"));
     } else {
-        currentUser = users.find((u) => u.id === clientId);
+        currentUser = usersJSON.find((u) => u.id === clientId);
         let notification;
         if (currentUser !== undefined) {
             if (error) {
@@ -557,8 +532,9 @@ app.get("/account/:id", async (req, res) => {
 app.get("/account/:id/chat/:chatId", async (req, res) => {
     const clientId = req.params.id;
     const chatId = req.params.chatId;
-    const currentUser = users.find((u) => u.id === clientId);
-    const currentContact = users.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
+    const usersJSON = await loadJSON(usersDB);
+    const currentUser = usersJSON.find((u) => u.id === clientId);
+    const currentContact = usersJSON.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== clientId));
     if (currentUser && currentContact) {
         let allChats = [];
         // console.log("facts:", facts);
@@ -599,9 +575,10 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
     }
 });
 
-app.get("/events/:userId", (req, res) => {
+app.get("/events/:userId", async (req, res) => {
     const userId = req.params.userId;
-    const currentUser = users.find((u) => u.id === userId);
+    const usersJSON = await loadJSON(usersDB);
+    const currentUser = usersJSON.find((u) => u.id === userId);
     if (currentUser) {
         eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
     } else {
@@ -609,9 +586,10 @@ app.get("/events/:userId", (req, res) => {
     }
 });
 
-app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
+app.get("/account/:id/makeChatWith/:contactId", async (req, res) => {
     const userId = req.params.userId;
-    const currentUser = users.find((u) => u.id === userId);
+    const usersJSON = await loadJSON(usersDB);
+    const currentUser = usersJSON.find((u) => u.id === userId);
     if (currentUser) {
         eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
     } else {
@@ -619,10 +597,11 @@ app.get("/account/:id/makeChatWith/:contactId", (req, res) => {
     }
 });
 
-app.get("/status", (request, response) => {
+app.get("/status", async (request, response) => {
+    const usersJSON = await loadJSON(usersDB);
     loadJSON(subsDB)
         .then((data) => {
-            response.json({ users: users, facts: facts, allSubscribers: data });
+            response.json({ users: usersJSON, facts: facts, allSubscribers: data });
             // Proceed with data processing or other operations
         })
         .catch((error) => {
@@ -630,11 +609,15 @@ app.get("/status", (request, response) => {
         });
 });
 
-app.get("/showUsers", (request, response) => response.json({ users: users }));
+app.get("/showUsers", async (request, response) => {
+    const usersJSON = await loadJSON(usersDB);
+    response.json({ users: usersJSON })
+});
 
-app.get("/getStatusContact/:id", (req, res) => {
+app.get("/getStatusContact/:id", async (req, res) => {
     const contactId = req.params.id;
-    const currentContact = users.find((user) => user.id === contactId);
+    const usersJSON = await loadJSON(usersDB);
+    const currentContact = usersJSON.find((user) => user.id === contactId);
     const status = currentContact.status;
     res.json({ status });
 });
@@ -642,7 +625,8 @@ app.get("/getStatusContact/:id", (req, res) => {
 app.get("/getAllContacts/:id", async (req, res) => {
     let allContacts = [];
     const userId = req.params.id;
-    const currentUser = users.find((user) => user.id === userId);
+    const usersJSON = await loadJSON(usersDB);
+    const currentUser = usersJSON.find((user) => user.id === userId);
     if (currentUser) {
         console.log("CURRENT USER: ", currentUser);
         currentUser.contacts.forEach((contact) => {
@@ -750,12 +734,15 @@ app.post("/delete-subscription/:id", function (req, res) {
     return res.redirect(`/login`);
 });
 
-app.post("/updateStatus", function (req, res) {
+app.post("/updateStatus",async function  (req, res) {
     const { status, userId } = req.body;
     console.log("status", status, "user", userId);
-    const currentUser = users.find((user) => user.id == userId);
+    const usersJSON = await loadJSON(usersDB);
+    console.log(usersJSON);
+    const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
         currentUser.status = status;
+        saveJSON(usersDB, usersJSON);
         res.status(200).send("status updated");
     } else {
         res.status(400).send("User doesn't exists");
@@ -778,11 +765,8 @@ app.post("/updateStatus", function (req, res) {
 //     .then((data) => {
 //         if (data) {
 //             // TODO Manipulate data (e.g., push a value to an array)
-//             const newData = {
-//                 name: "Jop",
-//                 id: 13287,
-//             };
-//             data.push(newData);
+
+//             data.push();
 //             // Save updated JSON data to file
 //             saveJSON("db.json", data);
 //             console.log("JSON data saved successfully.");
