@@ -27,6 +27,7 @@ Deze week ben ik druk bezig geweest met het beetje stylen van de webpagina, ik v
 Na een beetje styling te hebben toegevoegd, notifications werkend te hebben gekregen, had ik nog een aantal dingen op mijn lijstje die ik nog graag wilde doen. Dat waren:
 
 - [x] Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beeld moet blijven staan.
+- [ ] Data in json zetten zodat ie het behoud.
 
 - [ ] Contacten en chats tegelijk toevoegen en makkelijker maken, ook fetchen bij de ander
 - [ ] online of offline status fetchen van je contact.
