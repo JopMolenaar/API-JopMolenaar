@@ -37,7 +37,7 @@ const PORT = process.env.PORT || 4000;
 ///////////////////////////////
 const usersDB = "database/users.json";
 // const clientsDB = "database/clients.json";
-// const chatsDB = "database/chats.json";
+const chatsDB = "database/chats.json";
 const subsDB = "database/subs.json";
 // const messagesDB = "database/messages.json";
 
@@ -49,11 +49,6 @@ app.listen(PORT, () => {
 ///////// Stored data /////////
 ///////////////////////////////
 let clients = [];
-let chats = [
-    {
-        id: "3889220298",
-    },
-];
 let facts = [
     {
         text: "Hoi Mink",
@@ -285,10 +280,12 @@ async function addContact(req, res) {
     };
 }
 
-function addChat(contactToAddChat, userToAddChat) {
+async function addChat(contactToAddChat, userToAddChat) {
+    const chats = await loadJSON(chatsDB);
     // Generate a random 10-digit ID for the chat
     const chatId = generateUniqueId(chats);
     chats.push({ id: chatId });
+    saveJSON(chatsDB, chats);
     const newChatUser = {
         id: chatId,
         name: contactToAddChat.name,
