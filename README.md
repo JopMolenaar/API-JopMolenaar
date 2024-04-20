@@ -12,6 +12,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 
 - Installation
 - Use of features
+- API's
 - Whishlist
 - License
 
@@ -34,6 +35,15 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
    npm install
    ```
 
+<!-- 4. Make an .env file and fill in these variables:
+   
+   - PRIVATE_VAPID_KEY
+   - MAIL
+ // public key also
+   For the vapid key's that you need for the push notifications, type this command in the terminal
+   ``
+   This will create a public and private key. -->
+
 4. Start the application:
 
    ```
@@ -44,121 +54,46 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 
 ## Use of features
 
-## Ideas/checklist
-
-### Quick fix
+<!-- - [x] Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beeld moet blijven staan.
+- [x] Contacten en chats tegelijk toevoegen en makkelijker maken, ook fetchen bij de ander
+- [x] online of offline status fetchen van je contact.
+- [x] Data opslaan in json bestanden
 
 - [x] Be able to chat to people 
 - [x] making accounts en opslaan op de server
 - [x] adding contacts en opslaan op de server
-- [x] messages opslaan op de server
-- [x] maak de id als je een account aanmaakt een random nummer van 7 cijfers. Dan zijn de id’s in de url iets veiliger.
-- [x] error messages
+- [x] messages opslaan op de server -->
+<!-- - [x] maak de id als je een account aanmaakt een random nummer van 7 cijfers. Dan zijn de id’s in de url iets veiliger. -->
+<!-- - [x] error messages
 - [x] Some checks on the server like: checking if the generated id is really unique
 - [x] sending chats works without js and js is only for optimization
 - [x] adding a contact using js without refreshing the page
-- [ ] fetch the data on the server to see if you have a new contact and if a chat exists
+- [x] fetch the data on the server to see if you have a new contact and if a chat exists
+- [x] Online status next to the name of the contact in the chat
+- [ ] Automatic scrolling when you send or get a message. -->
 
-### API’s
+<!-- // gedaan: local storage dat je in bent gelogd, logd je meteen bij het ops
+tarten van de app weer in.
+// gedaan: Als iemand uitlogd, local storage removen en sub verwijderen -->
 
-- [ ] using the api that allows it to place the webapp on your mobile front screen without a browser bar and with a logo as logo. 
-- [ ] getting notifications (api)
+## API's
 
-### Extra 
+<!-- - [ ] using the api that allows it to place the webapp on your mobile front screen without a browser bar and with a logo as logo. 
+- [ ] getting notifications (api) -->
 
+
+## Whishlist
+
+<!-- - [ ] Alleen noti's sturen als je offline bent. 
+- [ ] normale pf picture 
+- [ ] Iets betere styling (status, login)
+- [ ] gsap animaion als je een bericht stuurt of als je bepaalde emoji's stuurt
+- [ ] password toevoegen
+- [ ] offline beschikbaar 
 - [ ] learn more about builders, use one and upgrade the performance.
-- [ ] Make chatgroups 
-- [ ] have a nice styling 
-- [ ] Online status next to the name of the contact in the chat
-
-### Extra extra:
-
-- [ ] Sla data op in json zodat als de server restart de data niet weg is. 
+- [ ] Make chat groups 
+- [ ] Have a nice styling  -->
 
 ## License
 
 My website is open-source and released under the [MIT License](LICENSE).
-
-<!-- # API @cmda-minor-web 2023 - 2024
-
-Het web is een geweldige plek en de beschikbare technologieën ervan zijn vandaag de dag krachtiger dan ooit tevoren.
-De kracht van het web ligt in het feit dat het een platform is dat voor iedereen beschikbaar is en dat het gebaseerd is
-op open standaarden. De technologieën worden ontworpen en gespecificeerd op basis van consensus en zijn niet in handen
-van één enkele entiteit.
-
-Desondanks zijn er veel mensen en bedrijven die vinden dat het internet niet voldoet aan hun behoeften. Dit blijkt uit
-de pogingen van grote techbedrijven om hun eigen afgesloten ecosystemen te creëren. Ze streven hiermee naar controle over
-zowel de gebruikerservaring als de gegenereerde data.
-
-**In dit vier weken durende vak zullen we de kracht van het web ervaren en kijken hoe we (mobiele) web apps kunnen maken die
-net zo aantrekkelijk zijn als native mobiele apps. We beginnen met het maken van een server-side gerenderde applicatie
-waarbij we geleidelijk de gebruikerservaring verbeteren met relevante beschikbare web API's.**
-
-## Doelen
-
-Na deze cursus zul je:
-
-- In staat zijn om een server-side gerenderde applicatie te maken.
-- In staat zijn om een enerverende gebruikerservaring te creëren.
-- Een breder begrip hebben van het web en zijn mogelijkheden.
-
-## Opdracht
-
-In dit vak zullen we een van de meest voorkomende app-concepten van vandaag gebruiken en ontdekken dat we deze kunnen
-maken met moderne webtechnologie.
-
-Voorbeelden:
-
-- Maak je eigen streamingplatform (Netflix/Spotify).
-- Maak je eigen doom-scroll-app (Instagram/TikTok).
-- Maak je eigen chatapplicatie (WhatsApp/Signal).
-- Een andere app die je zelf leuk vindt...
-
-Voorbeeld content API's die je kan gebruiken:
-
-- [MovieDB API](https://developer.themoviedb.org/reference/intro/getting-started)
-- [Rijksmuseum API](https://data.rijksmuseum.nl/object-metadata/api/)
-- [Spotify API](https://developer.spotify.com/documentation/web-api)
-
-Voorbeelden van Web API's die je kan gebruiken:
-
-- [Page Transition API voor animaties tusse npagina's](https://developer.mozilla.org/en-US/docs/Web/API/Page_Transitions_API)
-- [Web Animations API voor complexe animaties](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API)
-- [Service Worker API voor installable web apps](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API)
-- [Web Push API voor push notifications](https://developer.mozilla.org/en-US/docs/Web/API/Push_API)
-- [Server sent events voor realtime functionaliteit](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events)
-- [Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API)
-- [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API)
-- [Web Share API voor sharen van content binnen de context van de gebruiker](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/share)
-- ...
-
-De lijst is eindeloos, laat je vooral inspireren op de overzichtspagina van [MDN](https://developer.mozilla.org/en-US/docs/Web/API).
-
-## Beoordeling
-
-Je zal beoordeeld worden op basis van je code, creativiteit en je gedocumenteerde proces. Om het vak te halen zal je aan
-de 3 criteria hieronder moeten voldoen. Een hoger cijfer kan je halen door verder te gaan dan de basis.
-
-| Tekortkomingen | Criterium                                                                                                                                                                                                                                 | Verbeteringen |
-|:---------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------|
-|                | *Project* - Je app werkt en is online beschikbaar. Daarnaast heb je je concept, technologieen, gebruikte Web API's en proces duidelijk gedocumenteerd in je `README.md`.                                                                  |               |
-|                | *Functionaliteit* - Je hebt minstens een overzicht en een detailpagina. Hoe meer dynamischer je functionaliteit.hoe beter.                                                                                                                |               |
-|                | *Enhancements* - Je laat zien dat je begrijpt hoe het web werkt door meerdere Web API's te gebruiken om een zo aantrekkelijk mogelijke gebruikerservaring neer te zetten. Je gebruikt je eigen creativiteit om iets uniks neer te zetten. |               |
-
-## Planning
-
-| Planning                   | Maandag             | Dinsdag               | Vrijdag                |
-|----------------------------|---------------------|-----------------------|------------------------|
-| Week 1 - Kickoff & concept | Pasen               | Introductie en uitleg | Feedback gesprekken    |
-| Week 2 - The baseline      | College + workshops | Workshops             | Feedback gesprekken    |
-| Week 3 - Enhance           | College + workshops | Workshops             | Feedback gesprekken    |
-| Week 4 - Enhance & wrap up | Individuele vragen  | Individuele vragen    | Beoordelingsgesprekken |
-
-## Resources
-
-- Om serverside te kunnen renderen maak ik gebruik van [TinyHttp](https://github.com/tinyhttp), maar je kan ook kiezen voor [Express](https://expressjs.com/).
-- Voor templating maak ik gebruik van [LiquidJS](https://liquidjs.com/), maar je kan ook kiezen voor [EJS](https://ejs.co/).
-- Voor build tooling(CSS en JS) maak ik gebruik van [Vite](https://vitejs.dev/).
-
-Voel je vrij om je eigen technolgieën te kiezen, zolang je maar kan uitleggen waarom je deze hebt gekozen en zolang
-je geen gebruik maakt van een framework zoals React, Vue, Svelte, Angular, etc.  -->
