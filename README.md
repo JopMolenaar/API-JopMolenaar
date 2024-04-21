@@ -13,7 +13,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 - Installation
 - Use of features
 - API's
-- Whishlist
+- Wishlist
 - License
 
 ## Installation
@@ -21,30 +21,40 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 1. Clone the repository:
 
     ```
-    git clone https://github.com/JopMolenaar/API-JopMolenaar.git
+    $ git clone https://github.com/JopMolenaar/API-JopMolenaar.git
     ```
 2. Navigate to the project directory:
 
    ```
-   cd myApp
+   $ cd myApp
    ```
 
 3. Install the dependencies:
 
    ```
-   npm install
+   $ npm install
    ```
 
-<!-- 4. Make an .env file and fill in these variables:
+4. Make an `.env` file and fill in these variables:
    
    - PRIVATE_VAPID_KEY
    - MAIL
- // public key also
-   For the vapid key's that you need for the push notifications, type this command in the terminal
-   ``
-   This will create a public and private key. -->
 
-4. Start the application:
+   For the vapid key's that you need for the push notifications, type this command in the terminal
+   ```
+   $ npm install -g web-push
+   $ web-push generate-vapid-keys
+   ```
+   This will create a public and a private key. Put the private key in the env variable and place the public one here:
+
+   ```js
+   const vapidKeys = {
+      publicKey: // HERE //,
+      privateKey: process.env.PRIVATE_VAPID_KEY,
+   };
+   ```
+
+5. Start the application:
 
    ```
    npm run dev
@@ -82,7 +92,7 @@ tarten van de app weer in.
 - [ ] getting notifications (api) -->
 
 
-## Whishlist
+## Wishlist
 
 <!-- - [ ] Alleen noti's sturen als je offline bent. 
 - [ ] normale pf picture 

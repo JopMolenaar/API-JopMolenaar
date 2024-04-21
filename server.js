@@ -36,7 +36,6 @@ const PORT = process.env.PORT || 4000;
 /////// DATABASES (json) //////
 ///////////////////////////////
 const usersDB = "database/users.json";
-// const clientsDB = "database/clients.json";
 const chatsDB = "database/chats.json";
 const subsDB = "database/subs.json";
 const messagesDB = "database/messages.json";
@@ -85,7 +84,6 @@ async function eventsHandler(request, response, userId) {
         "Cache-Control": "no-cache",
     };
     response.writeHead(200, headers);
-    // const clients = await loadJSON(clientsDB);
     clients.forEach((client) => {
         if (client.userId === userId) {
             const dupliId = client.userId;
@@ -116,18 +114,19 @@ async function eventsHandler(request, response, userId) {
     const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
         currentUser.status = "Online";
+        saveJSON(usersDB, usersJSON);
     }
 
-    // TODO set status from the user that has userId to online
     clients.push(newClient);
 
     request.on("close", () => {
         console.log(`${clientId} Connection closed`);
         clients = clients.filter((client) => client.id !== clientId);
-        // TODO set status from the user that has client.userId to offline
         const currentUser = usersJSON.find((user) => user.id == userId);
         if (currentUser) {
+            console.log("SET STATUS TO Offline");
             currentUser.status = "Offline";
+            saveJSON(usersDB, usersJSON);
         }
     });
     console.log("clients:", clients);
@@ -136,8 +135,6 @@ async function eventsHandler(request, response, userId) {
 
 async function addFact(request, response, next) {
     const { text, userId, chatId, messageId, dateTime } = request.body;
-    // console.log("dateTime:", dateTime);
-    // console.log(text, userId, chatId, messageId, dateTime);
     const usersJSON = await loadJSON(usersDB);
     const senderName = usersJSON.find((u) => u.id === userId);
     const from = senderName.name;
@@ -150,7 +147,10 @@ async function addFact(request, response, next) {
     saveJSON(messagesDB, messages);
     saveJSON(usersDB, usersJSON);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
-    sendPushNoti(request.body, receiverId);
+
+    if (currentReceiver.status === "Offline") {
+        sendPushNoti(request.body, receiverId);
+    }
 
     return { newFact, redirect: `/account/${userId}/chat/${chatId}` };
 }
@@ -247,11 +247,11 @@ async function addContact(req, res) {
         userToAddContact.contacts.push(newContactForUser);
         contactToAdd.contacts.push(newContact);
 
-        chatId = addChat(contactToAdd, userToAddContact);
+        chatId = addChat(contactToAdd, userToAddContact, usersJSON);
+        saveJSON(usersDB, usersJSON);
     } else {
         return { status: 400, message: "Contact already exists", error: true };
     }
-    saveJSON(usersDB, usersJSON);
     return {
         status: 201,
         message: "contact added succesfully",
@@ -262,10 +262,12 @@ async function addContact(req, res) {
     };
 }
 
-async function addChat(contactToAddChat, userToAddChat) {
+async function addChat(contactToAddChat, userToAddChat, usersJSON) {
+    console.log("ADD CHAT");
     const chats = await loadJSON(chatsDB);
     // Generate a random 10-digit ID for the chat
     const chatId = generateUniqueId(chats);
+    console.log("CHAT:", chatId);
     chats.push({ id: chatId });
     saveJSON(chatsDB, chats);
     const newChatUser = {
@@ -285,6 +287,7 @@ async function addChat(contactToAddChat, userToAddChat) {
     // Update chats array for both user and contact
     userToAddChat.chats.push(newChatUser);
     contactToAddChat.chats.push(newChatContact);
+    saveJSON(usersDB, usersJSON);
     return chatId;
 }
 
@@ -592,7 +595,7 @@ app.get("/status", async (request, response) => {
 
 app.get("/showUsers", async (request, response) => {
     const usersJSON = await loadJSON(usersDB);
-    response.json({ users: usersJSON })
+    response.json({ users: usersJSON });
 });
 
 app.get("/getStatusContact/:id", async (req, res) => {
@@ -604,18 +607,26 @@ app.get("/getStatusContact/:id", async (req, res) => {
 });
 
 app.get("/getAllContacts/:id", async (req, res) => {
-    let allContacts = [];
     const userId = req.params.id;
     const usersJSON = await loadJSON(usersDB);
     const currentUser = usersJSON.find((user) => user.id === userId);
     if (currentUser) {
-        console.log("CURRENT USER: ", currentUser);
-        currentUser.contacts.forEach((contact) => {
-            const chat = currentUser.chats.find((c) => c.contactId === contact.id);
-            const chatId = chat.id;
-            allContacts.push({ contact, chatId });
+        const contacts = currentUser.contacts;
+        const promises = contacts.map(async (contact) => {
+            const chat = await currentUser.chats.find((c) => c.contactId === contact.id);
+            const chatId = chat ? chat.id : null; // Check if chat exists
+            return { contact, chatId };
         });
-        res.json({ allContacts });
+
+        // Wait for all promises to resolve
+        Promise.all(promises)
+            .then((allContacts) => {
+                res.json({ allContacts });
+            })
+            .catch((error) => {
+                console.error("Error processing contacts:", error);
+                res.status(500).json({ error: "Failed to process contacts" });
+            });
     } else {
         return res.status(500).send("There is an error");
     }
@@ -715,11 +726,11 @@ app.post("/delete-subscription/:id", function (req, res) {
     return res.redirect(`/login`);
 });
 
-app.post("/updateStatus",async function  (req, res) {
+app.post("/updateStatus", async function (req, res) {
     const { status, userId } = req.body;
     console.log("status", status, "user", userId);
     const usersJSON = await loadJSON(usersDB);
-    console.log(usersJSON);
+    // console.log(usersJSON);
     const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
         currentUser.status = status;
