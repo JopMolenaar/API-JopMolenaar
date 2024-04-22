@@ -64,45 +64,48 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 
 ## Use of features
 
-<!-- - [x] Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beeld moet blijven staan.
-- [x] Contacten en chats tegelijk toevoegen en makkelijker maken, ook fetchen bij de ander
-- [x] online of offline status fetchen van je contact.
-- [x] Data opslaan in json bestanden
-
 - [x] Be able to chat to people 
-- [x] making accounts en opslaan op de server
-- [x] adding contacts en opslaan op de server
+- [x] making accounts
+- [x] adding contacts with chats
+- [x] Store data in a json file instead of the server
+- [x] Fetch data on the background and update when needed (contact list and contact status)
+- [ ] The chat works without js, js is only for a better UX and fetching data on the background
+- [ ] Error messages popups are displayed with a error message when there is an error.
+- [ ] Automatic scrolling when you send or get a message. 
+
+<!-- - [x] Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beeld moet blijven staan.
+
+
+
+
 - [x] messages opslaan op de server -->
 <!-- - [x] maak de id als je een account aanmaakt een random nummer van 7 cijfers. Dan zijn de id’s in de url iets veiliger. -->
-<!-- - [x] error messages
-- [x] Some checks on the server like: checking if the generated id is really unique
-- [x] sending chats works without js and js is only for optimization
-- [x] adding a contact using js without refreshing the page
-- [x] fetch the data on the server to see if you have a new contact and if a chat exists
-- [x] Online status next to the name of the contact in the chat
+<!-- 
+
+
 - [ ] Automatic scrolling when you send or get a message. -->
 
 <!-- // gedaan: local storage dat je in bent gelogd, logd je meteen bij het ops
 tarten van de app weer in.
 // gedaan: Als iemand uitlogd, local storage removen en sub verwijderen -->
 
+<!-- Alleen noti's sturen als je offline bent.  -->
+
 ## API's
 
-<!-- - [ ] using the api that allows it to place the webapp on your mobile front screen without a browser bar and with a logo as logo. 
-- [ ] getting notifications (api) -->
-
+- Idle detection
+- Notification api (great tutorial and information about it: [web-push-book](https://web-push-book.gauntface.com/))
 
 ## Wishlist
 
-<!-- - [ ] Alleen noti's sturen als je offline bent. 
-- [ ] normale pf picture 
-- [ ] Iets betere styling (status, login)
-- [ ] gsap animaion als je een bericht stuurt of als je bepaalde emoji's stuurt
-- [ ] password toevoegen
-- [ ] offline beschikbaar 
-- [ ] learn more about builders, use one and upgrade the performance.
+- [ ] Add custom profile picture 
+- [ ] A bit better styling
+- [ ] gsap animation when you send or receive a message 
+- [ ] add passwords to accounts
+- [ ] offline available
+- [ ] send the offline send message as soon as someone is back online
+- [ ] Use a builder
 - [ ] Make chat groups 
-- [ ] Have a nice styling  -->
 
 ## License
 

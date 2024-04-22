@@ -1,1 +1,1 @@
-[]
+[{"id":"66657722","name":"Jop","status":"Online","chats":[{"id":"42272021","name":"Mink","contactId":"58548822"}],"contacts":[{"id":"58548822","name":"Mink","existingChat":true}],"pfPicture":"/icons/black.jpeg"},{"id":"58548822","name":"Mink","status":"Offline","chats":[{"id":"42272021","name":"Jop","contactId":"66657722"}],"contacts":[{"id":"66657722","name":"Jop","existingChat":true}],"pfPicture":"/icons/black.jpeg"}]

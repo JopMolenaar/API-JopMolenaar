@@ -49,7 +49,7 @@ app.listen(PORT, () => {
 ////////// Functions //////////
 ///////////////////////////////
 function loadJSON(filename) {
-    console.log("Get:", filename);
+    // console.log("Get:", filename);
     if (fs.existsSync(filename)) {
         // Read file asynchronously and parse JSON data
         return new Promise((resolve, reject) => {
@@ -107,7 +107,7 @@ async function eventsHandler(request, response, userId) {
     };
 
     const usersJSON = await loadJSON(usersDB);
-    console.log("USERS: ", usersJSON);
+    // console.log("USERS: ", usersJSON);
 
     // saveJSON(usersDB, usersJSON);
 
@@ -129,7 +129,7 @@ async function eventsHandler(request, response, userId) {
             saveJSON(usersDB, usersJSON);
         }
     });
-    console.log("clients:", clients);
+    // console.log("clients:", clients);
     saveJSON(usersDB, usersJSON);
 }
 
@@ -139,7 +139,6 @@ async function addFact(request, response, next) {
     const senderName = usersJSON.find((u) => u.id === userId);
     const from = senderName.name;
     const currentReceiver = usersJSON.find((u) => u.chats.find((chat) => chat.id === chatId && u.id !== userId));
-    // TODO if receiver is online, stuur het dan niet, als ie niet online is, stuur het dan wel.
     const receiverId = currentReceiver.id;
     const newFact = { text, userId, receiverId, from, chatId, messageId, dateTime }; // Include receiverId in the newFact object
     const messages = await loadJSON(messagesDB);
@@ -323,7 +322,7 @@ function isValidSaveRequest(req, res) {
 }
 
 function getSubscriptionsFromDatabase(id) {
-    console.log("GET SUB");
+    // console.log("GET SUB");
     let subscribersToResolve = [];
     let dontSendTwice = [];
     return new Promise((resolve, reject) => {
@@ -331,20 +330,20 @@ function getSubscriptionsFromDatabase(id) {
             .then((allSubscribers) => {
                 if (allSubscribers) {
                     allSubscribers.forEach((sub) => {
-                        console.log(sub.userId, id);
+                        // console.log(sub.userId, id);
                         if (sub.userId === id) {
-                            console.log("SUB", sub);
+                            // console.log("SUB", sub);
                             if (dontSendTwice[0]) {
                                 dontSendTwice.forEach((subTwice) => {
                                     if (subTwice.id !== sub.id && subTwice.endpoint !== sub.endpoint) {
                                         subscribersToResolve.push(sub);
-                                        console.log("Send to: ", sub.userId);
+                                        // console.log("Send to: ", sub.userId);
                                         dontSendTwice.push(sub);
                                     }
                                 });
                             } else {
                                 subscribersToResolve.push(sub);
-                                console.log("Send to: ", sub.userId);
+                                // console.log("Send to: ", sub.userId);
                                 dontSendTwice.push(sub);
                             }
                         }
@@ -386,7 +385,7 @@ function deleteSubscriptionFromDatabase(id) {
 }
 
 function triggerPushMsg(subscription, dataToSend) {
-    console.log("TRIGGER PUSH MSG", subscription.subscription, dataToSend);
+    // console.log("TRIGGER PUSH MSG", subscription.subscription, dataToSend);
     return webpush.sendNotification(subscription.subscription, dataToSend).catch((err) => {
         if (err.statusCode === 410) {
             console.log("ERROR", err.statusCode, "ID", subscription.id);
@@ -399,7 +398,7 @@ function triggerPushMsg(subscription, dataToSend) {
 }
 
 function saveSubscriptionToDatabase(subscription, userId) {
-    console.log("SAVE SUB", userId);
+    // console.log("SAVE SUB", userId);
     return new Promise((resolve, reject) => {
         loadJSON(subsDB)
             .then((allSubscribers) => {
@@ -434,30 +433,22 @@ function saveSubscriptionToDatabase(subscription, userId) {
 }
 
 async function sendPushNoti(data, sendTo) {
-    // const { title, body, icon, userId } = data;
     const { text, userId, icon } = data;
     const usersJSON = await loadJSON(usersDB);
     const currentUser = usersJSON.find((u) => u.id === userId);
     const dataToSend = { title: `Message from ${currentUser.name}`, body: text, icon };
     const payload = JSON.stringify(dataToSend);
-    // TODO = logic to send it to the right person if that person is not online
     return getSubscriptionsFromDatabase(sendTo).then(function (subscriptions) {
-        console.log("SUBS:", subscriptions);
+        // console.log("SUBS:", subscriptions);
         let promiseChain = Promise.resolve();
         let doubleDev = [];
         for (let i = 0; i < subscriptions.length; i++) {
-            // if (!doubleDev.includes(subscriptions[i].subscription.endpoint)) {
             const subscription = subscriptions[i];
             doubleDev.push(subscriptions[i].subscription.endpoint);
             promiseChain = promiseChain.then(() => {
                 return triggerPushMsg(subscription, payload);
             });
-            // }
         }
-
-        // return promiseChain;
-        // redirect to the current chat page
-        // return res.redirect(`/account/${userId}`);
     });
 }
 ///////////////////////////////
@@ -473,7 +464,6 @@ app.get("/signup", async (req, res) => {
 });
 
 app.get("/account/:id", async (req, res) => {
-    const error = req.query.error; // Retrieve error message from query parameter
     const clientId = req.params.id;
     let currentUser;
     const usersJSON = await loadJSON(usersDB);
@@ -481,30 +471,9 @@ app.get("/account/:id", async (req, res) => {
         return res.send(renderTemplate("src/views/notFound.liquid"));
     } else {
         currentUser = usersJSON.find((u) => u.id === clientId);
-        let notification;
         if (currentUser !== undefined) {
-            if (error) {
-                return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, error, notification }));
-            }
             let showNotification = false;
-            // const notification = await getNotificationStatus(clientId);
-            // loadJSON(subsDB)
-            //     .then((data) => {
-            //         if (data) {
-            //             const foundData = data.find((u) => u.userId === clientId);
-            //             if (foundData) {
-            //                 showNotification = false;
-            //             }
-            //         } else {
-            //             console.log("File does not exist or is empty.");
-            //         }
-            // console.log(showNotification);
             return res.send(renderTemplate("src/views/chat.liquid", { currentUser: currentUser, showNotification, chatOpen: false }));
-            // })
-            // .catch((error) => {
-            //     console.error("Error loading or saving JSON:", error);
-            // });
-            // return res.send(renderTemplate("src/views/account.liquid", { user: currentUser, notification }));
         } else {
             return res.send(renderTemplate("src/views/notFound.liquid"));
         }
@@ -530,7 +499,7 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
                     direction = "incoming";
                 }
                 allChats.push({ fact, direction });
-                console.log(allChats);
+                // console.log(allChats);
             }
         });
         let showNotification = true;
@@ -545,7 +514,7 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
                 } else {
                     console.log("File does not exist or is empty.");
                 }
-                console.log(showNotification);
+                // console.log("NOTI header?:", showNotification);
                 return res.send(
                     renderTemplate("src/views/chat.liquid", { contact: currentContact, chats: allChats, currentUser, chatId, showNotification, chatOpen: true })
                 );
@@ -638,8 +607,6 @@ app.get("/getAllContacts/:id", async (req, res) => {
 
 app.post("/fact", async (req, res) => {
     const response = await addFact(req, res);
-    console.log(response);
-    // sendPushNoti(req.body);
     res.json(response.newFact);
 });
 app.post("/addMessageWithRefresh", async (req, res) => {
@@ -749,63 +716,3 @@ app.post("/updateStatus", async function (req, res) {
 // import { json, urlencoded } from "body-parser";
 // import { cors } from "@tinyhttp/cors";
 // issues with this when writing it with tinyhttp
-
-
-
-
-// loadJSON("db.json")
-//     .then((data) => {
-//         if (data) {
-//             // TODO Manipulate data (e.g., push a value to an array)
-
-//             data.push();
-//             // Save updated JSON data to file
-//             saveJSON("db.json", data);
-//             console.log("JSON data saved successfully.");
-//         } else {
-//             console.log("File does not exist or is empty.");
-//         }
-//     })
-//     .catch((error) => {
-//         console.error("Error loading or saving JSON:", error);
-//     });
-
-
-
-// function addUser(req, res) {
-//     const { name } = req.body;
-//     loadJSON(usersDB)
-//         .then((users) => {
-//             if (users) {
-//                 // Check if the user already exists
-//                 const existingUser = users.find((user) => user.name === name);
-//                 if (existingUser) {
-//                     return res.send(
-//                         renderTemplate("src/views/index.liquid", { page: "Sign-up", errorMessage: `User: ${name} already exists`, inputValue: name })
-//                     );
-//                 }
-
-//                 // Generate a unique ID for the new user
-//                 const id = generateUniqueId(users);
-//                 const newUser = {
-//                     id: id,
-//                     name: name,
-//                     chats: [],
-//                     contacts: [],
-//                 };
-
-//                 users.push(newUser);
-//                 console.log("All users:", users);
-//                 saveJSON(usersDB, users);
-//                 console.log("JSON data saved successfully.");
-//                 // Redirect to the account page of the new added user
-//                 return res.redirect(`/account/${id}`);
-//             } else {
-//                 console.log("File does not exist or is empty.");
-//                 renderTemplate("src/views/index.liquid", { page: "Sign-up", errorMessage: `There is an error` });
-//             }
-//         })
-//         .catch((error) => {
-//             console.error("Error loading or saving JSON:", error);
-//         });
-// }
