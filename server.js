@@ -584,14 +584,8 @@ app.get("/account/:id/makeChatWith/:contactId", async (req, res) => {
 app.get("/status", async (request, response) => {
     const usersJSON = await loadJSON(usersDB);
     const messages = await loadJSON(messagesDB);
-    loadJSON(subsDB)
-        .then((data) => {
-            response.json({ users: usersJSON, facts: messages, allSubscribers: data });
-            // Proceed with data processing or other operations
-        })
-        .catch((error) => {
-            console.error("Error loading JSON:", error);
-        });
+    const subs = await loadJSON(subsDB);
+    response.json({ users: usersJSON, facts: messages, allSubscribers: subs });
 });
 
 app.get("/showUsers", async (request, response) => {
