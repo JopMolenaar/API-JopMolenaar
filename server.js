@@ -128,6 +128,7 @@ async function saveJSON(filePath, data) {
     // return fs.writeFileSync(filename, JSON.stringify(json));
 
     try {
+        console.log(data);
         const existingData = await readDataFromGitHub(repositoryName, filePath, accessToken);
         const content = JSON.stringify(data, null, 2);
         const encodedContent = Buffer.from(content).toString("base64");
@@ -159,39 +160,6 @@ async function saveJSON(filePath, data) {
         console.error("Error writing data to GitHub:", error.message);
     }
 }
-
-// async function writeDataToGitHub(data, repositoryName, filePath, accessToken) {
-//     try {
-//         const existingData = await readDataFromGitHub(repositoryName, filePath, accessToken);
-//         const content = JSON.stringify(data, null, 2);
-//         const encodedContent = Buffer.from(content).toString("base64");
-
-//         const body = {
-//             message: "Update data.json",
-//             content: encodedContent,
-//             sha: existingData ? existingData.sha : undefined, // Use existing SHA if available for update
-//         };
-
-//         if (!existingData || !existingData.sha) {
-//             throw new Error("Unable to retrieve existing file SHA.");
-//         }
-
-//         const response = await axios.put(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, body, {
-//             headers: {
-//                 Authorization: `token ${accessToken}`,
-//                 "Content-Type": "application/json",
-//             },
-//         });
-
-//         if (response.status === 200) {
-//             console.log("Data successfully written to GitHub repository.");
-//         } else {
-//             throw new Error(`Failed to write data: ${response.status} - ${response.statusText}`);
-//         }
-//     } catch (error) {
-//         console.error("Error writing data to GitHub:", error.message);
-//     }
-// }
 
 function renderTemplate(template, data) {
     const templateData = {
@@ -231,9 +199,6 @@ async function eventsHandler(request, response, userId) {
     };
 
     const usersJSON = await loadJSON(usersDB);
-    // console.log("USERS: ", usersJSON);
-
-    // saveJSON(usersDB, usersJSON);
 
     const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
@@ -243,7 +208,7 @@ async function eventsHandler(request, response, userId) {
 
     clients.push(newClient);
 
-    request.on("close", () => {
+    request.on("close", async () => {
         console.log(`${clientId} Connection closed`);
         clients = clients.filter((client) => client.id !== clientId);
         const currentUser = usersJSON.find((user) => user.id == userId);
@@ -254,7 +219,7 @@ async function eventsHandler(request, response, userId) {
         }
     });
     // console.log("clients:", clients);
-    saveJSON(usersDB, usersJSON);
+    // saveJSON(usersDB, usersJSON);
 }
 
 async function addFact(request, response, next) {
@@ -268,7 +233,7 @@ async function addFact(request, response, next) {
     const messages = await loadJSON(messagesDB);
     messages.push(newFact);
     saveJSON(messagesDB, messages);
-    saveJSON(usersDB, usersJSON);
+    // const response2 = await saveJSON(usersDB, usersJSON);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
 
     if (currentReceiver.status === "Offline") {
@@ -371,7 +336,7 @@ async function addContact(req, res) {
         contactToAdd.contacts.push(newContact);
 
         chatId = await addChat(contactToAdd, userToAddContact, usersJSON);
-        saveJSON(usersDB, usersJSON);
+        const response = await saveJSON(usersDB, usersJSON);
     } else {
         return { status: 400, message: "Contact already exists", error: true };
     }
@@ -392,7 +357,7 @@ async function addChat(contactToAddChat, userToAddChat, usersJSON) {
     const chatId = generateUniqueId(chats);
     console.log("CHAT:", chatId);
     chats.push({ id: chatId });
-    saveJSON(chatsDB, chats);
+    const response = await saveJSON(chatsDB, chats);
     const newChatUser = {
         id: chatId,
         name: contactToAddChat.name,
@@ -412,7 +377,7 @@ async function addChat(contactToAddChat, userToAddChat, usersJSON) {
     // Update chats array for both user and contact
     userToAddChat.chats.push(newChatUser);
     contactToAddChat.chats.push(newChatContact);
-    saveJSON(usersDB, usersJSON);
+    const response2 = await saveJSON(usersDB, usersJSON);
     return chatId;
 }
 
@@ -489,7 +454,7 @@ function deleteSubscriptionFromDatabase(id) {
     loadJSON(subsDB)
         .then((allSubscribers) => {
             if (allSubscribers) {
-                allSubscribers.forEach((sub) => {
+                allSubscribers.forEach(async (sub) => {
                     if (sub.id === id) {
                         const index = allSubscribers.indexOf(sub);
                         if (index > -1) {
@@ -497,7 +462,7 @@ function deleteSubscriptionFromDatabase(id) {
                             allSubscribers.splice(index, 1); // 2nd parameter means remove one item only
                         }
                         // Save updated JSON data to file
-                        saveJSON(subsDB, allSubscribers);
+                        const response = await saveJSON(subsDB, allSubscribers);
                         console.log("JSON data saved successfully.");
                     }
                 });
@@ -527,7 +492,7 @@ function saveSubscriptionToDatabase(subscription, userId) {
     // console.log("SAVE SUB", userId);
     return new Promise((resolve, reject) => {
         loadJSON(subsDB)
-            .then((allSubscribers) => {
+            .then(async (allSubscribers) => {
                 if (allSubscribers) {
                     allSubscribers.forEach((sub) => {
                         // console.log(sub.id, id);
@@ -545,7 +510,7 @@ function saveSubscriptionToDatabase(subscription, userId) {
                     };
                     allSubscribers.push(newSubscriber);
                     // Save updated JSON data to file
-                    saveJSON(subsDB, allSubscribers);
+                    const response = await saveJSON(subsDB, allSubscribers);
                     console.log("JSON data saved successfully.");
                     resolve(id); // Resolve with the generated ID
                 } else {
@@ -797,7 +762,7 @@ app.post("/delete-subscription/:id", function (req, res) {
     loadJSON(subsDB)
         .then((allSubscribers) => {
             if (allSubscribers) {
-                allSubscribers.forEach((sub) => {
+                allSubscribers.forEach(async (sub) => {
                     if (sub.userId === userId) {
                         const index = allSubscribers.indexOf(sub);
                         if (index > -1) {
@@ -805,7 +770,7 @@ app.post("/delete-subscription/:id", function (req, res) {
                             allSubscribers.splice(index, 1); // 2nd parameter means remove one item only
                         }
                         // Save updated JSON data to file
-                        saveJSON(subsDB, allSubscribers);
+                        const response = await saveJSON(subsDB, allSubscribers);
                         console.log("JSON data saved successfully.");
                     }
                 });
@@ -827,7 +792,7 @@ app.post("/updateStatus", async function (req, res) {
     const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
         currentUser.status = status;
-        saveJSON(usersDB, usersJSON);
+        const response = await saveJSON(usersDB, usersJSON);
         res.status(200).send("status updated");
     } else {
         res.status(400).send("User doesn't exists");
