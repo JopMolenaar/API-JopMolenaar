@@ -45,12 +45,10 @@ main {
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
     top: 0;
-    /* position: absolute; */
     width: 100%;
-    /* padding-left: 3.5em; */
-    /* width: auto; */
     & img {
         border-radius: 50%;
+        background-color: white;
     }
     h2 {
         font-size: 1.4em;
@@ -113,6 +111,7 @@ main {
                 border: solid black 1px;
                 border-radius: 50%;
                 bottom: 0;
+                background-color: white;
             }
             & > span {
                 bottom: 0;

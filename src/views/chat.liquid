@@ -51,11 +51,10 @@
                   {{ messageDate }}
                 {% endif %}
               </span>
-          
-              {% if contact.pfPicture %}
-                <img src="{{ contact.pfPicture }}">
-              {% else %}
-                <img src="/images/profileDefault.png">
+              {% if chat.direction == "incoming" %}
+                    <img src="{{ contact.pfPicture }}">
+                {% else %}
+                  <img src="{{ currentUser.pfPicture }}">
               {% endif %}
             </p>
           {% endfor %}
@@ -118,7 +117,7 @@
   <ul class="chats">
     {% for chat in currentUser.chats %}
       <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}">
-      <img src="{{ currentUser.pfPicture }}" alt="pf">  
+      <img src="{{ chat.pfPicture }}" alt="pf">  
       {{ chat.name }}</a></li>
     {% endfor %} 
   </ul>

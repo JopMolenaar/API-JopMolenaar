@@ -303,11 +303,13 @@ async function addChat(contactToAddChat, userToAddChat, usersJSON) {
         id: chatId,
         name: contactToAddChat.name,
         contactId: contactToAddChat.id,
+        pfPicture: contactToAddChat.pfPicture,
     };
     const newChatContact = {
         id: chatId,
         name: userToAddChat.name,
         contactId: userToAddChat.id,
+        pfPicture: userToAddChat.pfPicture,
     };
     const setChatToTrueContact = contactToAddChat.contacts.find((c) => c.id === userToAddChat.id);
     const setChatToTrueUser = userToAddChat.contacts.find((c) => c.id === contactToAddChat.id);
@@ -613,8 +615,9 @@ app.get("/getAllContacts/:id", async (req, res) => {
         const contacts = currentUser.contacts;
         const promises = contacts.map(async (contact) => {
             const chat = await currentUser.chats.find((c) => c.contactId === contact.id);
+            const pfPicture = chat.pfPicture;
             const chatId = chat ? chat.id : null; // Check if chat exists
-            return { contact, chatId };
+            return { contact, chatId, pfPicture };
         });
 
         // Wait for all promises to resolve
