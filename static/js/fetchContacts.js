@@ -25,4 +25,4 @@ async function getContactStatus() {
     });
 }
 getContactStatus();
-setInterval(getContactStatus, 30000);
+setInterval(getContactStatus, 3000);
