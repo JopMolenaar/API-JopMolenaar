@@ -106,7 +106,7 @@
           <input type="hidden" name="userId" value="{{ currentUser.id }}">
           <button type="submit">Add contact</button>
        </form>
-       <h4>Add new pf picture:</h4>
+       <h4>Change profile picture:</h4>
         <form id="profilePictureForm" action="/newProfilePicture/{{  currentUser.id  }}" method="POST" enctype="multipart/form-data">
           <input type="file" name="pfPicture" id="pfPictureInput" accept="image/*" onchange="validateFile()">
           <span id="fileError" style="color: red;"></span>

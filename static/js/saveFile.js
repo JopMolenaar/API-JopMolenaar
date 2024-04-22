@@ -28,14 +28,6 @@ function validateFile() {
         return;
     }
 
-    // Check image dimensions
     const img = new Image();
-    img.onload = function () {
-        if (img.width > 200 || img.height > 200) {
-            fileError.textContent = "Image dimensions should be 200x200 pixels or less.";
-            fileInput.value = ""; // Clear the file input
-            return;
-        }
-    };
     img.src = URL.createObjectURL(file);
 }
