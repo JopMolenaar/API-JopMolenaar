@@ -78,40 +78,123 @@ app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
 });
 
-// example usersDB
-async function getAndWrite() {
-    const data = await readDataFromGitHub(repositoryName, usersDB, accessToken);
-    const jsonData = JSON.parse(data.content);
-
-    // const newItem = { name: "Jop", age: 19 };
-
-    jsonData.push(newItem);
-    writeDataToGitHub(jsonData, repositoryName, usersDB, accessToken);
-}
-
 ///////////////////////////////
 ////////// Functions //////////
 ///////////////////////////////
-function loadJSON(filename) {
-    // console.log("Get:", filename);
-    if (fs.existsSync(filename)) {
-        // Read file asynchronously and parse JSON data
-        return new Promise((resolve, reject) => {
-            fs.readFile(filename, (err, data) => {
-                const jsonData = JSON.parse(data);
-                resolve(jsonData); // Resolve with parsed JSON data
-            });
+async function loadJSON(filePath) {
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, {
+            headers: {
+                Authorization: `token ${accessToken}`,
+                "Content-Type": "application/json",
+            },
         });
-    } else {
-        // File does not exist, return null or appropriate value
-        return Promise.resolve(null);
+
+        if (response.status === 200) {
+            const { content } = response.data; // Extract content
+            const decodedContent = Buffer.from(content, "base64").toString("utf-8");
+            const jsonData = JSON.parse(decodedContent); // Parse decoded content into JSON
+            return jsonData;
+        } else {
+            throw new Error(`Failed to read data: ${response.status} - ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error("Error reading data from GitHub:", error.message);
+        return null;
     }
 }
 
-function saveJSON(filename, json) {
-    console.log("save filename:", filename);
-    return fs.writeFileSync(filename, JSON.stringify(json));
+async function readDataFromGitHub(repositoryName, filePath, accessToken) {
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, {
+            headers: {
+                Authorization: `token ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 200) {
+            const { sha, content } = response.data; // Extract sha and content
+            const decodedContent = Buffer.from(content, "base64").toString("utf-8");
+            return { sha, content: decodedContent };
+        } else {
+            throw new Error(`Failed to read data: ${response.status} - ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error("Error reading data from GitHub:", error.message);
+        return null;
+    }
 }
+
+async function saveJSON(filePath, data) {
+    // console.log("save filename:", filename);
+    // return fs.writeFileSync(filename, JSON.stringify(json));
+
+    try {
+        const existingData = await readDataFromGitHub(repositoryName, filePath, accessToken);
+        const content = JSON.stringify(data, null, 2);
+        const encodedContent = Buffer.from(content).toString("base64");
+
+        const body = {
+            message: "Update data.json",
+            content: encodedContent,
+            sha: existingData ? existingData.sha : undefined, // Use existing SHA if available for update
+        };
+
+        if (!existingData || !existingData.sha) {
+            throw new Error("Unable to retrieve existing file SHA.");
+        }
+
+        const response = await axios.put(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, body, {
+            headers: {
+                Authorization: `token ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 200) {
+            console.log("Data successfully written to GitHub repository.");
+            return response;
+        } else {
+            throw new Error(`Failed to write data: ${response.status} - ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error("Error writing data to GitHub:", error.message);
+    }
+}
+
+// async function writeDataToGitHub(data, repositoryName, filePath, accessToken) {
+//     try {
+//         const existingData = await readDataFromGitHub(repositoryName, filePath, accessToken);
+//         const content = JSON.stringify(data, null, 2);
+//         const encodedContent = Buffer.from(content).toString("base64");
+
+//         const body = {
+//             message: "Update data.json",
+//             content: encodedContent,
+//             sha: existingData ? existingData.sha : undefined, // Use existing SHA if available for update
+//         };
+
+//         if (!existingData || !existingData.sha) {
+//             throw new Error("Unable to retrieve existing file SHA.");
+//         }
+
+//         const response = await axios.put(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, body, {
+//             headers: {
+//                 Authorization: `token ${accessToken}`,
+//                 "Content-Type": "application/json",
+//             },
+//         });
+
+//         if (response.status === 200) {
+//             console.log("Data successfully written to GitHub repository.");
+//         } else {
+//             throw new Error(`Failed to write data: ${response.status} - ${response.statusText}`);
+//         }
+//     } catch (error) {
+//         console.error("Error writing data to GitHub:", error.message);
+//     }
+// }
 
 function renderTemplate(template, data) {
     const templateData = {
@@ -251,7 +334,7 @@ async function addUser(req, res) {
 
     usersJSON.push(newUser);
     // console.log("All users:", usersJSON);
-    saveJSON(usersDB, usersJSON);
+    const response = await saveJSON(usersDB, usersJSON);
     // Redirect to the account page of the new added user
     return res.redirect(`/account/${id}`);
 }
@@ -290,7 +373,7 @@ async function addContact(req, res) {
         userToAddContact.contacts.push(newContactForUser);
         contactToAdd.contacts.push(newContact);
 
-        chatId = addChat(contactToAdd, userToAddContact, usersJSON);
+        chatId = await addChat(contactToAdd, userToAddContact, usersJSON);
         saveJSON(usersDB, usersJSON);
     } else {
         return { status: 400, message: "Contact already exists", error: true };
@@ -481,6 +564,7 @@ function saveSubscriptionToDatabase(subscription, userId) {
 async function sendPushNoti(data, sendTo) {
     const { text, userId, icon } = data;
     const usersJSON = await loadJSON(usersDB);
+    console.log("userJson: ", usersJSON);
     const currentUser = usersJSON.find((u) => u.id === userId);
     const dataToSend = { title: `Message from ${currentUser.name}`, body: text, icon };
     const payload = JSON.stringify(dataToSend);
@@ -498,60 +582,6 @@ async function sendPushNoti(data, sendTo) {
     });
 }
 
-async function readDataFromGitHub(repositoryName, filePath, accessToken) {
-    try {
-        const response = await axios.get(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, {
-            headers: {
-                Authorization: `token ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (response.status === 200) {
-            const { sha, content } = response.data; // Extract sha and content
-            const decodedContent = Buffer.from(content, "base64").toString("utf-8");
-            return { sha, content: decodedContent };
-        } else {
-            throw new Error(`Failed to read data: ${response.status} - ${response.statusText}`);
-        }
-    } catch (error) {
-        console.error("Error reading data from GitHub:", error.message);
-        return null;
-    }
-}
-
-async function writeDataToGitHub(data, repositoryName, filePath, accessToken) {
-    try {
-        const existingData = await readDataFromGitHub(repositoryName, filePath, accessToken);
-        const content = JSON.stringify(data, null, 2);
-        const encodedContent = Buffer.from(content).toString("base64");
-
-        const body = {
-            message: "Update data.json",
-            content: encodedContent,
-            sha: existingData ? existingData.sha : undefined, // Use existing SHA if available for update
-        };
-
-        if (!existingData || !existingData.sha) {
-            throw new Error("Unable to retrieve existing file SHA.");
-        }
-
-        const response = await axios.put(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, body, {
-            headers: {
-                Authorization: `token ${accessToken}`,
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (response.status === 200) {
-            console.log("Data successfully written to GitHub repository.");
-        } else {
-            throw new Error(`Failed to write data: ${response.status} - ${response.statusText}`);
-        }
-    } catch (error) {
-        console.error("Error writing data to GitHub:", error.message);
-    }
-}
 ///////////////////////////////
 /////////// app.get ///////////
 ///////////////////////////////
@@ -631,6 +661,7 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
 app.get("/events/:userId", async (req, res) => {
     const userId = req.params.userId;
     const usersJSON = await loadJSON(usersDB);
+    console.log("userJson: ", usersJSON);
     const currentUser = usersJSON.find((u) => u.id === userId);
     if (currentUser) {
         eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
@@ -642,6 +673,7 @@ app.get("/events/:userId", async (req, res) => {
 app.get("/account/:id/makeChatWith/:contactId", async (req, res) => {
     const userId = req.params.userId;
     const usersJSON = await loadJSON(usersDB);
+    console.log("userJson: ", usersJSON);
     const currentUser = usersJSON.find((u) => u.id === userId);
     if (currentUser) {
         eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
@@ -665,6 +697,7 @@ app.get("/showUsers", async (request, response) => {
 app.get("/getStatusContact/:id", async (req, res) => {
     const contactId = req.params.id;
     const usersJSON = await loadJSON(usersDB);
+    console.log(usersJSON);
     const currentContact = usersJSON.find((user) => user.id === contactId);
     const status = currentContact.status;
     res.json({ status });
