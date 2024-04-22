@@ -4,12 +4,43 @@
 
 require("dotenv").config();
 const express = require("express");
+const app = express();
 const { Liquid } = require("liquidjs");
 const sirv = require("sirv");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const webpush = require("web-push");
 const fs = require("fs");
+const path = require("path");
+const multer = require("multer");
+
+// Define the upload directory path relative to the project root
+const uploadDirectory = path.join(__dirname, "static/uploads");
+
+// Ensure that the upload directory exists; create it if it doesn't
+if (!fs.existsSync(uploadDirectory)) {
+    fs.mkdirSync(uploadDirectory, { recursive: true });
+}
+
+// Multer disk storage configuration
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDirectory);
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    },
+});
+
+// Initialize multer with the configured storage
+// const upload = multer({ storage, limits: { fileSize: 2000 } });
+
+const upload = multer({
+    storage,
+    limits: {
+        fileSize: 2000, // 2 KB
+    },
+});
 
 const vapidKeys = {
     publicKey: "BNvTbER8XgCTGxnGOVRLnnCfHA5WdTfe51CEHtGBAVeJuDbtsGjojizJIe-hgDbNda_zevi3cv_mf9Z642JcqP8",
@@ -22,7 +53,6 @@ const engine = new Liquid({
     extname: ".liquid",
 });
 
-const app = express();
 app.use(sirv("static"));
 app.use(cors());
 app.use(bodyParser.json());
@@ -65,7 +95,7 @@ function loadJSON(filename) {
 }
 
 function saveJSON(filename, json) {
-    console.log(filename);
+    console.log("save filename:", filename);
     return fs.writeFileSync(filename, JSON.stringify(json));
 }
 
@@ -157,17 +187,17 @@ async function addFact(request, response, next) {
 async function sendEventsToChat(newFact, chatId) {
     // const clients = await loadJSON(clientsDB);
     clients.forEach((client) => {
-        console.log("id's: ", client.userId);
+        // console.log("id's: ", client.userId);
     });
     clients.forEach((client) => {
         if (client.userId === newFact.userId) {
-            console.log("New fact:", newFact);
+            // console.log("New fact:", newFact);
             const sender = newFact.userId;
             const receiver = newFact.receiverId;
             clients.forEach((client) => {
-                console.log("user id", sender, "receiver:", receiver);
+                // console.log("user id", sender, "receiver:", receiver);
                 if (client.userId == receiver || client.userId == sender) {
-                    console.log("send to: ", client.id);
+                    // console.log("send to: ", client.id);
                     client.response.write(`data: ${JSON.stringify(newFact)}\n\n`); // This sends the message to the client I think
                 }
             });
@@ -202,11 +232,11 @@ async function addUser(req, res) {
         status: "Offline",
         chats: [],
         contacts: [],
-        pfPicture: "/icons/black.jpeg",
+        pfPicture: "/images/profileDefault.png",
     };
 
     usersJSON.push(newUser);
-    console.log("All users:", usersJSON);
+    // console.log("All users:", usersJSON);
     saveJSON(usersDB, usersJSON);
     // Redirect to the account page of the new added user
     return res.redirect(`/account/${id}`);
@@ -216,9 +246,9 @@ async function addContact(req, res) {
     const { name, userId } = req.body;
 
     const usersJSON = await loadJSON(usersDB);
-    console.log("USERS: ", usersJSON);
+    // console.log("USERS: ", usersJSON);
 
-    console.log(name, userId);
+    // console.log(name, userId);
     let chatId;
     const userToAddContact = usersJSON.find((u) => u.id === userId);
     const contactToAdd = usersJSON.find((u) => u.name === name);
@@ -612,7 +642,7 @@ app.post("/fact", async (req, res) => {
 app.post("/addMessageWithRefresh", async (req, res) => {
     const { text, userId, chatId, messageId, dateTime } = req.body;
     const response = await addFact(req, res);
-    console.log(response);
+    // console.log(response);
     return res.redirect(`/account/${userId}/chat/${chatId}`);
 });
 
@@ -631,13 +661,13 @@ app.post("/addContact", async (req, res) => {
 });
 app.post("/addContactJs", async (req, res) => {
     const response = await addContact(req, res);
-    console.log(response);
+    console.log("response add contact:", response);
     return res.status(200).send(response);
 });
 
 app.post("/save-subscription/:id", function (req, res) {
     const userId = req.params.id;
-    console.log(userId);
+    console.log("UID save sub", userId);
     if (!isValidSaveRequest(req, res)) {
         return;
     }
@@ -705,6 +735,27 @@ app.post("/updateStatus", async function (req, res) {
         res.status(200).send("status updated");
     } else {
         res.status(400).send("User doesn't exists");
+    }
+});
+
+app.post("/newProfilePicture/:id", upload.single("pfPicture"), async function (req, res) {
+    try {
+        const userId = req.params.id;
+        const fileDetails = req.file;
+        if (fileDetails.size > 2000) {
+            return res.status(400).json({ error: "File size exceeds the allowed limit (2 KB)." });
+        }
+
+        const userData = await loadJSON(usersDB);
+        const currentUser = userData.find((user) => user.id == userId);
+        currentUser.pfPicture = `/uploads/${fileDetails.originalname}`;
+        saveJSON(usersDB, userData);
+        // res.json({ message: "File uploaded successfully", file: fileDetails });
+        // return to account page
+        return res.redirect(`/account/${userId}`);
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        res.status(500).json({ error: "Failed to upload file" });
     }
 });
 

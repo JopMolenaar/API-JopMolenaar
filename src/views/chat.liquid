@@ -68,14 +68,14 @@
         <input type="hidden" name="chatId" value="{{ chatId }}">
         <input type="hidden" name="contactId" value="{{ contact.id }}">
         <input type="hidden" name="userId" value="{{ currentUser.id }}">
-        <button type="submit"><span class="visually-hidden">Send Text</span><img src="/icons/send.svg" alt=""> </button>
+        <button type="submit"><span class="visually-hidden">Send Text</span><img src="/icons/send.svg" alt=""></button>
       </form>
     </div>
     {% else %}
     <div class="chat-box empty">
-        <h2 class="visually-hidden">You havent opened a chat yet.</h2>
+        <h2 class="visually-hidden">You haven't opened a chat yet.</h2>
         <p>Open a chat</p>
-        <img src="" alt="">
+        <img src="/images/chatWolkjes.png" alt="Two text clouds next to eachother with nothing inside of it.">
       </div>
   {% endif %}
 <section class="sidebar">
@@ -106,16 +106,19 @@
           <input type="hidden" name="userId" value="{{ currentUser.id }}">
           <button type="submit">Add contact</button>
        </form>
+       <h4>Add new pf picture:</h4>
+        <form id="profilePictureForm" action="/newProfilePicture/{{  currentUser.id  }}" method="POST" enctype="multipart/form-data">
+          <input type="file" name="pfPicture" id="pfPictureInput" accept="image/*" onchange="validateFile()">
+          <span id="fileError" style="color: red;"></span>
+          <br>
+          <button type="submit">Upload</button>
+        </form>
       </div>
   </section>
   <ul class="chats">
     {% for chat in currentUser.chats %}
       <li><span class="visually-hidden">Chat with: </span><a href="/account/{{ currentUser.id }}/chat/{{ chat.id }}">
-     {% if currentUser.pfPicture %}
-      <img src="{{ currentUser.pfPicture }}" alt="pf">
-      {% else %}
-      <img src="/images/profileDefault.png" alt="pf">
-     {% endif %}      
+      <img src="{{ currentUser.pfPicture }}" alt="pf">  
       {{ chat.name }}</a></li>
     {% endfor %} 
   </ul>
@@ -130,4 +133,5 @@
 <script src="/js/sw.js"></script>
 <script src="/js/fetchStatus.js"></script>
 <script src="/js/fetchContacts.js"></script>
+<script src="/js/saveFile.js"></script>
 {% endblock %}
