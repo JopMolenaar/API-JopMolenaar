@@ -13,6 +13,7 @@ const webpush = require("web-push");
 const fs = require("fs");
 const path = require("path");
 const multer = require("multer");
+const axios = require("axios");
 
 // Define the upload directory path relative to the project root
 const uploadDirectory = path.join(__dirname, "static/uploads");
@@ -69,11 +70,24 @@ const usersDB = "database/users.json";
 const chatsDB = "database/chats.json";
 const subsDB = "database/subs.json";
 const messagesDB = "database/messages.json";
+const accessToken = process.env.ACCESSTOKEN;
+const repositoryName = process.env.REPONAME;
 let clients = [];
 
 app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
 });
+
+// example usersDB
+async function getAndWrite() {
+    const data = await readDataFromGitHub(repositoryName, usersDB, accessToken);
+    const jsonData = JSON.parse(data.content);
+
+    // const newItem = { name: "Jop", age: 19 };
+
+    jsonData.push(newItem);
+    writeDataToGitHub(jsonData, repositoryName, usersDB, accessToken);
+}
 
 ///////////////////////////////
 ////////// Functions //////////
@@ -482,6 +496,61 @@ async function sendPushNoti(data, sendTo) {
             });
         }
     });
+}
+
+async function readDataFromGitHub(repositoryName, filePath, accessToken) {
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, {
+            headers: {
+                Authorization: `token ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 200) {
+            const { sha, content } = response.data; // Extract sha and content
+            const decodedContent = Buffer.from(content, "base64").toString("utf-8");
+            return { sha, content: decodedContent };
+        } else {
+            throw new Error(`Failed to read data: ${response.status} - ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error("Error reading data from GitHub:", error.message);
+        return null;
+    }
+}
+
+async function writeDataToGitHub(data, repositoryName, filePath, accessToken) {
+    try {
+        const existingData = await readDataFromGitHub(repositoryName, filePath, accessToken);
+        const content = JSON.stringify(data, null, 2);
+        const encodedContent = Buffer.from(content).toString("base64");
+
+        const body = {
+            message: "Update data.json",
+            content: encodedContent,
+            sha: existingData ? existingData.sha : undefined, // Use existing SHA if available for update
+        };
+
+        if (!existingData || !existingData.sha) {
+            throw new Error("Unable to retrieve existing file SHA.");
+        }
+
+        const response = await axios.put(`https://api.github.com/repos/${repositoryName}/contents/${filePath}`, body, {
+            headers: {
+                Authorization: `token ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (response.status === 200) {
+            console.log("Data successfully written to GitHub repository.");
+        } else {
+            throw new Error(`Failed to write data: ${response.status} - ${response.statusText}`);
+        }
+    } catch (error) {
+        console.error("Error writing data to GitHub:", error.message);
+    }
 }
 ///////////////////////////////
 /////////// app.get ///////////
