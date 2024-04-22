@@ -69,27 +69,13 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 - [x] adding contacts with chats
 - [x] Store data in a json file instead of the server
 - [x] Fetch data on the background and update when needed (contact list and contact status)
-- [ ] The chat works without js, js is only for a better UX and fetching data on the background
-- [ ] Error messages popups are displayed with a error message when there is an error.
-- [ ] Automatic scrolling when you send or get a message. 
-
-<!-- - [x] Als je op mobiel de tekst balk focused, het scherm dan niet moet inzoomen en de header in beeld moet blijven staan.
-
-
-
-
-- [x] messages opslaan op de server -->
-<!-- - [x] maak de id als je een account aanmaakt een random nummer van 7 cijfers. Dan zijn de id’s in de url iets veiliger. -->
-<!-- 
-
-
-- [ ] Automatic scrolling when you send or get a message. -->
-
-<!-- // gedaan: local storage dat je in bent gelogd, logd je meteen bij het ops
-tarten van de app weer in.
-// gedaan: Als iemand uitlogd, local storage removen en sub verwijderen -->
-
-<!-- Alleen noti's sturen als je offline bent.  -->
+- [x] The chat works without js, js is only for a better UX and fetching data on the background
+- [x] Error messages popups are displayed with a error message when there is an error.
+- [x] Automatic scrolling when you send or get a message. 
+- [x] Remember the user (localstorage)
+- [x] Know when the user is online/offline or inactive and update the status of that user
+- [x] Send push notifications to people that have a subscription when they are offline
+- [x] Remove the subscription when someone logs out of their account. 
 
 ## API's
 
