@@ -3,7 +3,7 @@ const pForStatus = document.getElementById("statusOfContact");
 
 if (contactId) {
     getContactStatus();
-    setInterval(getContactStatus, 4000);
+    setInterval(getContactStatus, 3000);
 }
 
 async function getContactStatus() {
