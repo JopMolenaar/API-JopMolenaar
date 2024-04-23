@@ -35,7 +35,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
    $ npm install
    ```
 
-4. Make an `.env` file and fill in these variables to enable the push notifications feature:
+4. In order to send push notifications you need to make an `.env` file and fill in these variables:
    
    - PRIVATE_VAPID_KEY
    - MAIL
