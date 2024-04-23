@@ -128,7 +128,7 @@ async function saveJSON(filePath, data) {
     // return fs.writeFileSync(filename, JSON.stringify(json));
 
     try {
-        console.log(data);
+        // console.log(data);
         const existingData = await readDataFromGitHub(repositoryName, filePath, accessToken);
         const content = JSON.stringify(data, null, 2);
         const encodedContent = Buffer.from(content).toString("base64");

@@ -5,7 +5,7 @@ async function getContactStatus() {
     await fetch(`/getAllContacts/${userId}`).then(async (response) => {
         if (response.ok) {
             const data = await response.json();
-            console.log(data);
+            // console.log(data);
             chatList.innerHTML = "";
             data.allContacts.forEach((contact) => {
                 // TODO DYNAMIC CHATID AND PIC

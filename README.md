@@ -35,7 +35,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
    $ npm install
    ```
 
-4. Make an `.env` file and fill in these variables:
+4. Make an `.env` file and fill in these variables to enable the push notifications feature:
    
    - PRIVATE_VAPID_KEY
    - MAIL
@@ -49,15 +49,21 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 
    ```js
    const vapidKeys = {
-      publicKey: // HERE //,
+      publicKey: // HERE,
       privateKey: process.env.PRIVATE_VAPID_KEY,
    };
    ```
 
-5. Start the application:
+5. For experimental purposes I did not setup a database and writing to local json files with `fs` was getting emptied when restarting the server on render, so I made my own github repo api/database. To set this up for your own you need to:
+   - Make a private github repository.
+   - Generate a Personal access token (classic) under /settings -> /Developer settings. 
+   - Once you have that token, place this in the ACCESSTOKEN variable, and place the your account name / your repo name in the REPONAME variable in the `.env`. 
+   - Adjust the `usersDB`, `chatsDB`, `subsDB` and `messagesDB` variables in the server.js if needed, to the correct routes you have setup in your repo. 
+
+6. Start the application:
 
    ```
-   npm run dev
+   $ npm run dev
    ```
 
    The application will be accessible at `http://localhost:4000`.
@@ -81,6 +87,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 
 - Idle detection
 - Notification api (great tutorial and information about it: [web-push-book](https://web-push-book.gauntface.com/))
+- Github api (See installation on how to setup)
 
 ## Wishlist
 
