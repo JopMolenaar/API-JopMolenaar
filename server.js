@@ -123,7 +123,7 @@ async function readDataFromGitHub(repositoryName, filePath, accessToken) {
     }
 }
 
-async function saveJSON(filePath, data) {
+async function saveJSON(filePath, data, line) {
     // console.log("save filename:", filename);
     // return fs.writeFileSync(filename, JSON.stringify(json));
 
@@ -151,13 +151,13 @@ async function saveJSON(filePath, data) {
         });
 
         if (response.status === 200) {
-            console.log("Data successfully written to GitHub repository.");
+            console.log("Data successfully written to GitHub repository.", "Line", line);
             return response;
         } else {
             throw new Error(`Failed to write data: ${response.status} - ${response.statusText}`);
         }
     } catch (error) {
-        console.error("Error writing data to GitHub:", error.message);
+        console.error("Error writing data to GitHub:", error.message, "Line", line);
     }
 }
 
@@ -203,7 +203,7 @@ async function eventsHandler(request, response, userId) {
     const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
         currentUser.status = "Online";
-        saveJSON(usersDB, usersJSON);
+        saveJSON(usersDB, usersJSON, 206);
     }
 
     clients.push(newClient);
@@ -215,7 +215,7 @@ async function eventsHandler(request, response, userId) {
         if (currentUser) {
             // console.log("SET STATUS TO Offline");
             currentUser.status = "Offline";
-            saveJSON(usersDB, usersJSON);
+            saveJSON(usersDB, usersJSON, 218);
         }
     });
     // console.log("clients:", clients);
@@ -232,7 +232,7 @@ async function addFact(request, response, next) {
     const newFact = { text, userId, receiverId, from, chatId, messageId, dateTime }; // Include receiverId in the newFact object
     const messages = await loadJSON(messagesDB);
     messages.push(newFact);
-    saveJSON(messagesDB, messages);
+    saveJSON(messagesDB, messages, 235);
     // const response2 = await saveJSON(usersDB, usersJSON);
     sendEventsToChat(newFact, chatId); // Send message to the specific chat
 
@@ -296,7 +296,7 @@ async function addUser(req, res) {
 
     usersJSON.push(newUser);
     // console.log("All users:", usersJSON);
-    const response = await saveJSON(usersDB, usersJSON);
+    const response = await saveJSON(usersDB, usersJSON, 299);
     // Redirect to the account page of the new added user
     return res.redirect(`/account/${id}`);
 }
@@ -336,7 +336,7 @@ async function addContact(req, res) {
         contactToAdd.contacts.push(newContact);
 
         chatId = await addChat(contactToAdd, userToAddContact, usersJSON);
-        const response = await saveJSON(usersDB, usersJSON);
+        const response = await saveJSON(usersDB, usersJSON, 339);
     } else {
         return { status: 400, message: "Contact already exists", error: true };
     }
@@ -357,7 +357,7 @@ async function addChat(contactToAddChat, userToAddChat, usersJSON) {
     const chatId = generateUniqueId(chats);
     // console.log("CHAT:", chatId);
     chats.push({ id: chatId });
-    const response = await saveJSON(chatsDB, chats);
+    const response = await saveJSON(chatsDB, chats, 360);
     const newChatUser = {
         id: chatId,
         name: contactToAddChat.name,
@@ -377,7 +377,7 @@ async function addChat(contactToAddChat, userToAddChat, usersJSON) {
     // Update chats array for both user and contact
     userToAddChat.chats.push(newChatUser);
     contactToAddChat.chats.push(newChatContact);
-    const response2 = await saveJSON(usersDB, usersJSON);
+    const response2 = await saveJSON(usersDB, usersJSON, 380);
     return chatId;
 }
 
@@ -462,7 +462,7 @@ function deleteSubscriptionFromDatabase(id) {
                             allSubscribers.splice(index, 1); // 2nd parameter means remove one item only
                         }
                         // Save updated JSON data to file
-                        const response = await saveJSON(subsDB, allSubscribers);
+                        const response = await saveJSON(subsDB, allSubscribers, 465);
                         console.log("JSON data saved successfully.");
                     }
                 });
@@ -510,7 +510,7 @@ function saveSubscriptionToDatabase(subscription, userId) {
                     };
                     allSubscribers.push(newSubscriber);
                     // Save updated JSON data to file
-                    const response = await saveJSON(subsDB, allSubscribers);
+                    const response = await saveJSON(subsDB, allSubscribers, 513);
                     console.log("JSON data saved successfully.");
                     resolve(id); // Resolve with the generated ID
                 } else {
@@ -777,7 +777,7 @@ app.post("/delete-subscription/:id", function (req, res) {
                             allSubscribers.splice(index, 1); // 2nd parameter means remove one item only
                         }
                         // Save updated JSON data to file
-                        const response = await saveJSON(subsDB, allSubscribers);
+                        const response = await saveJSON(subsDB, allSubscribers, 780);
                         console.log("JSON data saved successfully.");
                     }
                 });
@@ -799,7 +799,7 @@ app.post("/updateStatus", async function (req, res) {
     const currentUser = usersJSON.find((user) => user.id == userId);
     if (currentUser) {
         currentUser.status = status;
-        const response = await saveJSON(usersDB, usersJSON);
+        const response = await saveJSON(usersDB, usersJSON, 802);
         res.status(200).send("status updated");
     } else {
         res.status(400).send("User doesn't exists");
@@ -817,7 +817,7 @@ app.post("/newProfilePicture/:id", upload.single("pfPicture"), async function (r
         const userData = await loadJSON(usersDB);
         const currentUser = userData.find((user) => user.id == userId);
         currentUser.pfPicture = `/uploads/${fileDetails.originalname}`;
-        saveJSON(usersDB, userData);
+        saveJSON(usersDB, userData, 820);
         // res.json({ message: "File uploaded successfully", file: fileDetails });
         // return to account page
         return res.redirect(`/account/${userId}`);
