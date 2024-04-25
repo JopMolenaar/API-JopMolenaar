@@ -661,8 +661,13 @@ app.get("/getStatusContact/:id", async (req, res) => {
     const usersJSON = await loadJSON(usersDB);
     console.log(usersJSON);
     const currentContact = usersJSON.find((user) => user.id === contactId);
-    const status = currentContact.status;
-    res.json({ status });
+    if (currentContact) {
+        const status = currentContact.status;
+        res.json({ status });
+    } else {
+        return res.status(400).send("Can't read currentContact.status");
+    }
+
 });
 
 app.get("/getAllContacts/:id", async (req, res) => {
