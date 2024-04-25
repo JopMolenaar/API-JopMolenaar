@@ -2,7 +2,7 @@
 
 ## Description
 
-I wanted to make a chat app like WhatsApp or another app with a chat feature. 
+In this project which involved using APIs, and discovering features of the web you didn't know before, I made a chat app like WhatsApp and other messaging apps. I build the application with node.js, using server send events to let the receiver get the texts, idle detection to know if the user is active or not and the push notifications api to send notifications to the user if he is not online. I tried some experimental things during this project and one of them is that I did not set up a database. I stored the messages on the server in the beginning. After a while I used `fs` to store them in a json file instead of the server. But render, the service where I have put my web app online, resets the content of these files when the server restarts. And because I didn't wanted to set up a database, I thought of something different. I made a private github repository, generated an api key, and now I store the data and get the data from my own github api/database. 
 
 ## Process
 
@@ -82,6 +82,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 - [x] Know when the user is online/offline or inactive and update the status of that user
 - [x] Send push notifications to people that have a subscription when they are offline
 - [x] Remove the subscription when someone logs out of their account. 
+- [x] Add custom profile picture 
 
 ## API's
 
@@ -91,7 +92,7 @@ I wanted to make a chat app like WhatsApp or another app with a chat feature.
 
 ## Wishlist
 
-- [ ] Add custom profile picture 
+- [ ] Use a database instead of a github repo to store data
 - [ ] A bit better styling
 - [ ] gsap animation when you send or receive a message 
 - [ ] add passwords to accounts
