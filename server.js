@@ -213,7 +213,7 @@ async function eventsHandler(request, response, userId) {
         clients = clients.filter((client) => client.id !== clientId);
         const currentUser = usersJSON.find((user) => user.id == userId);
         if (currentUser) {
-            console.log("SET STATUS TO Offline");
+            // console.log("SET STATUS TO Offline");
             currentUser.status = "Offline";
             saveJSON(usersDB, usersJSON);
         }
@@ -351,11 +351,11 @@ async function addContact(req, res) {
 }
 
 async function addChat(contactToAddChat, userToAddChat, usersJSON) {
-    console.log("ADD CHAT");
+    // console.log("ADD CHAT");
     const chats = await loadJSON(chatsDB);
     // Generate a random 10-digit ID for the chat
     const chatId = generateUniqueId(chats);
-    console.log("CHAT:", chatId);
+    // console.log("CHAT:", chatId);
     chats.push({ id: chatId });
     const response = await saveJSON(chatsDB, chats);
     const newChatUser = {
@@ -392,10 +392,10 @@ async function verifyUser(req, res) {
 }
 
 function isValidSaveRequest(req, res) {
-    console.log("VALIDATE");
+    // console.log("VALIDATE");
     // Check the request body has at least an endpoint.
     if (!req.body || !req.body.endpoint) {
-        console.log("FALSE");
+        // console.log("FALSE");
         // Not a valid subscription.
         res.status(400);
         res.setHeader("Content-Type", "application/json");
@@ -496,11 +496,11 @@ function saveSubscriptionToDatabase(subscription, userId) {
                 if (allSubscribers) {
                     allSubscribers.forEach((sub) => {
                         // console.log(sub.id, id);
-                        if (sub.userId === userId && subscription.endpoint === sub.subscription.endpoint) {
-                            console.log("THIS ACCOUNT IS ALREADY GETTING NOTIFICATIONS");
-                        } else {
-                            console.log("NOT ALREADY GETTING NOTIFICATIONS");
-                        }
+                        // if (sub.userId === userId && subscription.endpoint === sub.subscription.endpoint) {
+                        //     console.log("THIS ACCOUNT IS ALREADY GETTING NOTIFICATIONS");
+                        // } else {
+                        //     console.log("NOT ALREADY GETTING NOTIFICATIONS");
+                        // }
                     });
                     const id = generateUniqueId(allSubscribers);
                     const newSubscriber = {
@@ -526,7 +526,7 @@ function saveSubscriptionToDatabase(subscription, userId) {
 async function sendPushNoti(data, sendTo) {
     const { text, userId, icon } = data;
     const usersJSON = await loadJSON(usersDB);
-    console.log("userJson: ", usersJSON);
+    // console.log("userJson: ", usersJSON);
     const currentUser = usersJSON.find((u) => u.id === userId);
     const dataToSend = { title: `Message from ${currentUser.name}`, body: text, icon };
     const payload = JSON.stringify(dataToSend);
@@ -623,7 +623,7 @@ app.get("/account/:id/chat/:chatId", async (req, res) => {
 app.get("/events/:userId", async (req, res) => {
     const userId = req.params.userId;
     const usersJSON = await loadJSON(usersDB);
-    console.log("userJson: ", usersJSON);
+    // console.log("userJson: ", usersJSON);
     const currentUser = usersJSON.find((u) => u.id === userId);
     if (currentUser) {
         eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
@@ -635,7 +635,7 @@ app.get("/events/:userId", async (req, res) => {
 app.get("/account/:id/makeChatWith/:contactId", async (req, res) => {
     const userId = req.params.userId;
     const usersJSON = await loadJSON(usersDB);
-    console.log("userJson: ", usersJSON);
+    // console.log("userJson: ", usersJSON);
     const currentUser = usersJSON.find((u) => u.id === userId);
     if (currentUser) {
         eventsHandler(req, res, userId); // Pass the user ID to eventsHandler
@@ -659,7 +659,7 @@ app.get("/showUsers", async (request, response) => {
 app.get("/getStatusContact/:id", async (req, res) => {
     const contactId = req.params.id;
     const usersJSON = await loadJSON(usersDB);
-    console.log(usersJSON);
+    // console.log(usersJSON);
     const currentContact = usersJSON.find((user) => user.id === contactId);
     if (currentContact) {
         const status = currentContact.status;
@@ -667,7 +667,6 @@ app.get("/getStatusContact/:id", async (req, res) => {
     } else {
         return res.status(400).send("Can't read currentContact.status");
     }
-
 });
 
 app.get("/getAllContacts/:id", async (req, res) => {
@@ -727,13 +726,13 @@ app.post("/addContact", async (req, res) => {
 });
 app.post("/addContactJs", async (req, res) => {
     const response = await addContact(req, res);
-    console.log("response add contact:", response);
+    // console.log("response add contact:", response);
     return res.status(200).send(response);
 });
 
 app.post("/save-subscription/:id", function (req, res) {
     const userId = req.params.id;
-    console.log("UID save sub", userId);
+    // console.log("UID save sub", userId);
     if (!isValidSaveRequest(req, res)) {
         return;
     }
@@ -791,7 +790,7 @@ app.post("/delete-subscription/:id", function (req, res) {
 
 app.post("/updateStatus", async function (req, res) {
     const { status, userId } = req.body;
-    console.log("status", status, "user", userId);
+    // console.log("status", status, "user", userId);
     const usersJSON = await loadJSON(usersDB);
     // console.log(usersJSON);
     const currentUser = usersJSON.find((user) => user.id == userId);
