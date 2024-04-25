@@ -672,6 +672,9 @@ app.get("/getStatusContact/:id", async (req, res) => {
 app.get("/getAllContacts/:id", async (req, res) => {
     const userId = req.params.id;
     const usersJSON = await loadJSON(usersDB);
+    if (!usersJSON) {
+        return res.status(500).send("There is an error");
+    }
     const currentUser = usersJSON.find((user) => user.id === userId);
     if (currentUser) {
         const contacts = currentUser.contacts;

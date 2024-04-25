@@ -1,6 +1,8 @@
 const userId = getIdFromUrl("account");
 const chatId = getIdFromUrl("chat");
 const empty = document.querySelector(".empty");
+const pfPictureProfile = document.querySelector(".profile > div:nth-of-type(1) > img").src;
+
 if (!empty) {
     const eventList = document.querySelector(".message-box div");
     const textForm = document.querySelector(".textForm");
@@ -21,7 +23,7 @@ if (!empty) {
             const formattedTime = `${currentTime.getHours().toString().padStart(2, "0")}:${currentTime.getMinutes().toString().padStart(2, "0")}`;
             time.textContent = formattedTime;
             const pfPicture = document.createElement("img");
-            pfPicture.src = "/images/profileDefault.png"; // TODO real pf picture
+            pfPicture.src = pfPictureProfile;
 
             const lastText = eventList.querySelector("p:last-child");
             console.log(lastText);
