@@ -23,15 +23,16 @@ if (!empty) {
             const formattedTime = `${currentTime.getHours().toString().padStart(2, "0")}:${currentTime.getMinutes().toString().padStart(2, "0")}`;
             time.textContent = formattedTime;
             const pfPicture = document.createElement("img");
-            pfPicture.src = pfPictureProfile;
 
-            const lastText = eventList.querySelector("p:last-child");
-            console.log(lastText);
+            // const lastText = eventList.querySelector("p:last-child");
+            // console.log(lastText);
 
             if (message.userId === userId) {
                 newElement.classList.add("away");
+                pfPicture.src = pfPictureProfile;
             } else {
                 newElement.classList.add("incoming");
+                pfPicture.src = "/images/profileDefault.png";
             }
             if (message.chatId === chatId) {
                 newElement.textContent = `${message.text}`;
